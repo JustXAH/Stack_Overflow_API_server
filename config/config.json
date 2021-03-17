@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": "ikhanenko",
+    "password": "Super_securepass_123",
+    "database": "usof",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "port": 3306
+  },
+  "test": {
+    "username": "ikhanenko",
+    "password": "Super_securepass_123",
+    "database": "usof",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "port": 3306
+  },
+  "production": {
+    "username": "ikhanenko",
+    "password": "Super_securepass_123",
+    "database": "usof",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "port": 3306
+  }
+}
