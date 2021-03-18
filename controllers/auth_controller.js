@@ -24,13 +24,13 @@ async function register(req, res) {
         else {
             const userByLogin = await User.findOne( { where: { login: req.body.login } })
             if (userByLogin)
-                res.status(400).json({
+                return res.status(400).json({
                     register: false,
                     message: "User with this login already exists"
                 })
             const userByEmail = await User.findOne({ where: { email: req.body.email } })
             if (userByEmail)
-                res.status(400).json({
+                return res.status(400).json({
                     register: false,
                     message: "User with this email already exists"
                 })
@@ -47,7 +47,6 @@ async function register(req, res) {
             });
             // Creating a verification message and sending it to the user email
             sendMail(await emailConfirmMessage(req.body.email, req.body.full_name, confirm_token.token));
-
             res.status(200).json({
                 register: true,
                 message: "User registered successfully"
@@ -63,18 +62,16 @@ async function email_confirmation(req, res) {
 
     if (userByConfirmLink) {
         if (userByConfirmLink.email_confirmed === true)
-            res.status(403).json({
+            return res.status(403).json({
                 confirm: false,
                 message: "Email already confirmed"
             });
-        else {
-            await User.update( { email_confirmed: true},
-                { where: { id: userByConfirmLink.id } });
-            res.status(200).json({
-                confirm: true,
-                message: "Email confirmed successfully"
-            });
-        }
+        await User.update({email_confirmed: true},
+            {where: {id: userByConfirmLink.id}});
+        res.status(200).json({
+            confirm: true,
+            message: "Email confirmed successfully"
+        });
     } else {
         res.status(404).json({
             confirm: false,
@@ -87,35 +84,32 @@ async function login(req, res) {
     try {
         const errors = validationResult(req).formatWith(loginFailures);
         if (!errors.isEmpty())
-            res.status(400).json(errors.array())
+            return res.status(400).json(errors.array())
+
+        const user = await User.findOne({where: {email: req.body.email}})
+        if (!user)
+            return res.status(403).json({
+                auth: false,
+                message: "Forbidden! Email not found"
+            });
+        else if (user.login !== req.body.login)
+            return res.status(403).json({
+                auth: false,
+                message: "Forbidden! Incorrect login"
+            });
+        else if (user.email_confirmed === false)
+            return res.status(403).json({
+                auth: false,
+                message: "Forbidden! Email not yet confirmed"
+            });
+        else if (await comparingHashPasswords(req.body.password, user.password) === false)
+            return res.status(403).json({
+                auth: false,
+                message: "Forbidden! Password doesn't match"
+            });
         else {
-            const user = await User.findOne({where: {email: req.body.email}})
-            if (!user) {
-                res.status(403).json({
-                    auth: false,
-                    message: "Forbidden! Email not found"
-                });
-            } else {
-                if (user.email_confirmed === false)
-                    res.status(403).json({
-                        auth: false,
-                        message: "Forbidden! Email not yet confirmed"
-                    });
-                else if (user.login !== req.body.login)
-                    res.status(403).json({
-                        auth: false,
-                        message: "Forbidden! Incorrect login"
-                    });
-                else if (await comparingHashPasswords(req.body.password, user.password) === false)
-                    res.status(403).json({
-                        auth: false,
-                        message: "Forbidden! Password doesn't match"
-                    });
-                else {
-                    const token = await JwtTokenCreator(user.id);
-                    res.status(200).json({auth: true, token: token});
-                }
-            }
+            const token = await JwtTokenCreator(user.id);
+            res.status(200).json({auth: true, token: token});
         }
     } catch (err) {
         res.status(500).json({error: err});
@@ -133,38 +127,33 @@ async function forgotPassword(req, res) {
     try {
         const errors = validationResult(req).formatWith(forgotPassFailures);
         if (!errors.isEmpty())
-            res.status(400).json(errors.array())
-        else {
-            const user = await User.findOne({ where: { email: req.body.email} });
-            // console.log(user)
-            if (!user) {
-                res.status(403).json({
-                    resetLinkSent: false,
-                    message: "Forbidden! Email not found"
-                });
-            } else {
-                if (user.email_confirmed === false) {
-                    res.status(403).json({
-                        auth: false,
-                        message: "Forbidden! Email not yet confirmed"
-                    });
-                }
-                else {
-                    const resetToken = await randomTokenCreator();
-                    await User.update({
-                        reset_token: resetToken.token,
-                        reset_token_expiresAt: resetToken.expiresAt
-                    }, {
-                        where: {id: user.id}
-                    });
+            return res.status(400).json(errors.array())
 
-                    sendMail(await resetPasswordMessage(user.email, user.full_name, resetToken.token));
-                    res.status(200).json({
-                        resetLinkSent: true,
-                        message: "The letter has been sent. Check your email"
-                    });
-                }
-            }
+        const user = await User.findOne({where: {email: req.body.email}});
+        // console.log(user)
+        if (!user) {
+            return res.status(403).json({
+                resetLinkSent: false,
+                message: "Forbidden! Email not found"
+            });
+        } else if (user.email_confirmed === false) {
+            return res.status(403).json({
+                auth: false,
+                message: "Forbidden! Email not yet confirmed"
+            });
+        } else {
+            const resetToken = await randomTokenCreator();
+            await User.update({
+                reset_token: resetToken.token,
+                reset_token_expiresAt: resetToken.expiresAt
+            }, {
+                where: {id: user.id}
+            });
+            sendMail(await resetPasswordMessage(user.email, user.full_name, resetToken.token));
+            res.status(200).json({
+                resetLinkSent: true,
+                message: "The letter has been sent. Check your email"
+            });
         }
     } catch (err) {
         res.status(500).json({error: err});
@@ -183,32 +172,32 @@ async function passwordResetForm(req, res) {
 
 async function resetPassword(req, res) {
     try {
-        const user = await User.findOne( { where: { reset_token: req.params.reset_token}});
-        const errors = validationResult(req).formatWith(resetPassFailures);
+        const user = await User.findOne({where: {reset_token: req.params.reset_token}});
         if (!user)
-            res.status(403).json({
+            return res.status(403).json({
                 reset_password: false,
                 message: "Invalid reset token"
             })
-        else if (user.reset_token_expiresAt < new Date(Date.now()))
-            res.status(403).json({
+        if (user.reset_token_expiresAt < new Date(Date.now()))
+            return res.status(403).json({
                 reset_password: false,
                 message: "Reset token expired"
             })
-        else if (!errors.isEmpty())
+
+        const errors = validationResult(req).formatWith(resetPassFailures);
+        if (!errors.isEmpty())
             res.status(400).json(errors.array())
-        else {
-            const newHashPassword = await passwordHashing(req.body.password);
-            await User.update({
-                password: newHashPassword
-            }, {
-                where: {id: user.id}
-            });
-            res.status(200).json({
-                resetPassword: true,
-                message: "Password reset successfully"
-            });
-        }
+
+        const newHashPassword = await passwordHashing(req.body.password);
+        await User.update({
+            password: newHashPassword
+        }, {
+            where: {id: user.id}
+        });
+        res.status(200).json({
+            resetPassword: true,
+            message: "Password reset successfully"
+        });
     } catch (err) {
         res.status(500).json({error: err});
     }
