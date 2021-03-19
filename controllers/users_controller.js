@@ -99,7 +99,7 @@ async function createNewUser(req, res) {
 
 async function avatarUpload(req, res) {
     try {
-
+        console.log(req)
 
         res.status(201).json({
             avatar_upload: true,
