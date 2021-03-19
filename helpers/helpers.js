@@ -3,7 +3,7 @@ const jwt  = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 async function passwordHashing(password) {
-    return bcrypt.hashSync(password, parseInt(process.env.SALT));
+    return bcrypt.hashSync(password, parseInt(process.env.SALT_ROUNDS));
 }
 
 async function comparingHashPasswords(req_password, user_password) {

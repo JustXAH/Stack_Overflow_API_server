@@ -24,13 +24,13 @@ async function register(req, res) {
         else {
             const userByLogin = await User.findOne( { where: { login: req.body.login } })
             if (userByLogin)
-                return res.status(400).json({
+                return res.status(403).json({
                     register: false,
                     message: "User with this login already exists"
                 })
             const userByEmail = await User.findOne({ where: { email: req.body.email } })
             if (userByEmail)
-                return res.status(400).json({
+                return res.status(403).json({
                     register: false,
                     message: "User with this email already exists"
                 })

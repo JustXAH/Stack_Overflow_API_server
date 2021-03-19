@@ -8,11 +8,14 @@ const validation = new Validation;
 const {
     getAllUsers,
     getUserById,
+    createNewUser,
+    avatarUpload
 } = require('../controllers/users_controller');
 
 router.get('/', verifyToken, getAllUsers);
 router.get('/:user_id', verifyToken, getUserById);
-// router.post('/register', validation.registerDataSchema, register);
+router.post('/', verifyToken, validation.registerDataSchema, createNewUser);
+router.post('/avatar', verifyToken, avatarUpload);
 // router.post('/login', validation.loginDataSchema, login);
 // router.post('/logout', verifyToken, logout);
 // router.post('/password-reset', validation.forgotPassDataSchema, forgotPassword);
