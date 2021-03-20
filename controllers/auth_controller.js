@@ -1,3 +1,5 @@
+'use strict';
+
 const User = require('../sequlize').User;
 const { validationResult } = require('express-validator');
 const {
@@ -92,25 +94,23 @@ async function login(req, res) {
                 auth: false,
                 message: "Forbidden! Email not found"
             });
-        else if (user.login !== req.body.login)
+        if (user.login !== req.body.login)
             return res.status(403).json({
                 auth: false,
                 message: "Forbidden! Incorrect login"
             });
-        else if (user.email_confirmed === false)
+        if (user.email_confirmed === false)
             return res.status(403).json({
                 auth: false,
                 message: "Forbidden! Email not yet confirmed"
             });
-        else if (await comparingHashPasswords(req.body.password, user.password) === false)
+        if (await comparingHashPasswords(req.body.password, user.password) === false)
             return res.status(403).json({
                 auth: false,
                 message: "Forbidden! Password doesn't match"
             });
-        else {
-            const token = await JwtTokenCreator(user.id);
-            res.status(200).json({auth: true, token: token});
-        }
+        const token = await JwtTokenCreator(user.id);
+        res.status(200).json({auth: true, token: token});
     } catch (err) {
         res.status(500).json({error: err});
     }

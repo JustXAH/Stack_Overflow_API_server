@@ -1,3 +1,5 @@
+'use strict';
+
 const registrationFailures = ({location, msg, param, value}) => {
     return {
         type: "Error",
