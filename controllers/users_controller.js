@@ -139,9 +139,15 @@ async function updateUserData(req, res) {
         })
         if (!userById)
             return res.status(404).json({
-                status: "Request error",
+                update_user_data: false,
                 message: "User not found by requested params ID"
             })
+        if (req.body.login === userById.login && (await User.findOne({ where: {login: req.body.login} })) !== null) {
+            return res.status(403).json({
+                update_user_data: false,
+                message: "Login is already taken"
+            })
+    }
         await User.update({
             login: req.body.login,
             password: hashPassword,
