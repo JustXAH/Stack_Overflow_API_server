@@ -129,7 +129,7 @@ async function updateUserData(req, res) {
         if (!errors.isEmpty()) {
             return res.status(400).json(errors.array())
         }
-        if (req.user.id !== req.params.user_id && req.user.role !== "admin")
+        if (req.user.id !== Number(req.params.user_id) && req.user.role !== "admin")
             return res.status(403).json({
                 update_user_data: false,
                 message: "Permission denied! Only the admin can change the data of other users"
@@ -166,12 +166,17 @@ async function updateUserData(req, res) {
 
 async function deleteUser(req, res) {
     try {
-        if (req.user.id !== req.params.user_id && req.user.role !== "admin")
+       if (req.user.id !== Number(req.params.user_id) && req.user.role !== "admin")
             return res.status(403).json({
                 delete_user: false,
                 message: "Permission denied! Only the admin can change the data of other users"
             })
         const user = await User.findByPk(req.params.user_id);
+        if (!user)
+            return res.status(404).json({
+                delete_user: false,
+                message: "User not found by requested params ID"
+            })
         await user.destroy();
         res.status(200).json({
             delete_user: true,
