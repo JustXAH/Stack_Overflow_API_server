@@ -96,7 +96,6 @@ async function createNewUser(req, res) {
 
 async function avatarUpload(req, res) {
     try {
-        // console.log(req.user)
         if (req.errorCode === 400)
             return res.status(400).json({
                 avatar_upload: false,
@@ -134,31 +133,59 @@ async function updateUserData(req, res) {
                 update_user_data: false,
                 message: "Permission denied! Only the admin can change the data of other users"
             })
-        const userById = await User.findByPk(req.params.user_id,{
-            attributes: ["id", "login", "full_name", "email", "avatar", "rating", "role"],
-        })
+        const userById = await User.findByPk(req.params.user_id)
         if (!userById)
             return res.status(404).json({
                 update_user_data: false,
                 message: "User not found by requested params ID"
             })
-        if (req.body.login === userById.login && (await User.findOne({ where: {login: req.body.login} })) !== null) {
+        if (req.body.login !== userById.login
+            && await User.findOne({ where: {login: req.body.login} })!== null) {
             return res.status(403).json({
                 update_user_data: false,
                 message: "Login is already taken"
             })
-    }
+        }
+        if (req.body.email !== userById.email
+            && await User.findOne({ where: {email: req.body.email} })!== null) {
+            return res.status(403).json({
+                update_user_data: false,
+                message: "Email is already taken"
+            })
+        }
+        let hashPassword;
+        if (req.body.password === undefined) {
+            hashPassword = userById.password;
+        }
+        else if (await comparingHashPasswords(req.body.password, userById.password) === false) {
+            hashPassword = await passwordHashing(req.body.password);
+        } else {
+                hashPassword = userById.password;
+            }
+        let confirm_token;
+        let emailConfirmed;
+        if (req.body.email !== userById.email) {
+            confirm_token = await randomTokenCreator();
+            emailConfirmed = false;
+            sendMail(await emailConfirmMessage(req.body.email, req.body.full_name, confirm_token.token));
+        } else {
+            confirm_token = userById.confirm_token;
+            emailConfirmed = userById.email_confirmed;
+        }
         await User.update({
             login: req.body.login,
             password: hashPassword,
             full_name: req.body.full_name,
             email: req.body.email,
-            confirm_token: confirm_token.token
-        })
+            confirm_token: confirm_token.token,
+            email_confirmed: emailConfirmed
+        }, {
+            where: { id: req.params.user_id }
+        });
         res.status(200).json({
             update_user_data: true,
             message: 'Updated user data successfully'
-        })
+        });
     } catch (err) {
         res.status(500).json({error: err});
     }

@@ -23,6 +23,4 @@ router.post('/password-reset', validation.forgotPassDataSchema, forgotPassword);
 router.get('/password-reset/:reset_token', passwordResetForm);
 router.post('/password-reset/:reset_token', validation.resetPassDataSchema, resetPassword);
 
-// router.post('/test', registerValidSchema, test);
-
 module.exports = router;

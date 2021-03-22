@@ -15,6 +15,7 @@ app.use(bodyParser.json());
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/posts', usersRouter);
 
 // start server
 const PORT = process.env.PORT || 3000;
