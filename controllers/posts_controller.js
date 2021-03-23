@@ -24,18 +24,18 @@ async function getAllPosts(req, res) {
         const { search, page, limit} = req.query
         let { order_by, order_direction, fromDate, toDate, status, category } = req.query
 
-        let searchData = {}
-        let filter1 = []
-        let filter2 = []
-        let filterStatus = []
-        let order = []
+        let searchData = {};
+        let filter1 = [];
+        let filter2 = [];
+        let filterStatus = [];
+        let order = [];
 
         if (order_by !== "id" && order_by !== "createdAt"
             && order_by !== 'updatedAt' && order_by !== 'rating')
-            order_by = "rating"
+            order_by = "rating";
 
         if (order_direction !== "desc" && order_direction !== "asc")
-            order_direction = "desc"
+            order_direction = "desc";
 
         // add the search term to the search object
         if (search) {
@@ -55,11 +55,13 @@ async function getAllPosts(req, res) {
 
         if (fromDate && toDate)
             filter1.push([new Date(fromDate), new Date(toDate)])
+        console.log(filter1);
         if (category)
             filter2.push(["category", category])
-
+        console.log(filter2);
         if (status && (status === "active" || status === "inactive"))
             filterStatus.push([status])
+        console.log(filterStatus);
 
         // transform function that can be passed to the  paginate method
         const transform = async (posts) => {

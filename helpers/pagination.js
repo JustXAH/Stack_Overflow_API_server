@@ -18,7 +18,7 @@ const paginate = async (model, pageSize, pageLimit, search = {}, filter1 = {}, f
         if (filter2 && filter2.length && filter2[0][0] === 'category') {
             options.include = [{
                 model: Category,
-                as: 'categories',
+                as: 'Categories',
                 where: {title: filter2[0][1]},
                 attributes: []
             }]
@@ -51,7 +51,7 @@ const paginate = async (model, pageSize, pageLimit, search = {}, filter1 = {}, f
             filter2,
             data: rows
         }
-    } catch (e) {
+    } catch (err) {
         throw 'Internal Server Error'
     }
 }
