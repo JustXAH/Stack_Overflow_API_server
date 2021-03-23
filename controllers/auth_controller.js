@@ -69,7 +69,7 @@ async function email_confirmation(req, res) {
                 message: "Email already confirmed"
             });
         await User.update({email_confirmed: true},
-            {where: {id: userByConfirmLink.id}});
+            {where: { id: userByConfirmLink.id }});
         res.status(200).json({
             confirm: true,
             message: "Email confirmed successfully"

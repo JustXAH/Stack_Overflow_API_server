@@ -16,11 +16,11 @@ module.exports = {
           key: "id"
         }
       },
-      publish_date: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW
-      },
+      // publish_date: {
+      //   type: Sequelize.DATE,
+      //   allowNull: false,
+      //   defaultValue: Sequelize.NOW
+      // },
       post_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
@@ -45,11 +45,13 @@ module.exports = {
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: new Date(Date.now())
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: new Date(Date.now())
       }
     });
   },

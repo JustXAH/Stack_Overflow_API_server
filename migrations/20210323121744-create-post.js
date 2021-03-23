@@ -20,11 +20,11 @@ module.exports = {
         type: Sequelize.STRING(1234),
         allowNull: false,
       },
-      publish_date: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW
-      },
+      // publish_date: {
+      //   type: Sequelize.DATE,
+      //   allowNull: false,
+      //   defaultValue: Sequelize.NOW
+      // },
       status: {
         type: Sequelize.ENUM('active', 'inactive'),
         allowNull: false,
@@ -34,21 +34,28 @@ module.exports = {
         type: Sequelize.STRING(1234),
         allowNull: false,
       },
-      categories: {
+      rating: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-          model: "Categories",
-          key: "id"
-        }
+        defaultValue: 0,
       },
+      // categories: {
+      //   type: Sequelize.INTEGER,
+      //   allowNull: false,
+      //   references: {
+      //     model: "Categories",
+      //     key: "id"
+      //   }
+      // },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: new Date(Date.now())
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: new Date(Date.now())
       }
     });
   },

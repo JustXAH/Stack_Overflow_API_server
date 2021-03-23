@@ -10,7 +10,7 @@ const {
     getAllPosts,
 } = require('../controllers/posts_controller');
 
-// router.get('/', verifyToken, getAllUsers);
+router.get('/', verifyToken, getAllPosts);
 // router.get('/:user_id', verifyToken, getUserById);
 // router.post('/', verifyToken, validation.registerDataSchema, createNewUser);
 // router.post('/avatar', verifyToken, imageUploadHandler, avatarUpload);

@@ -16,10 +16,11 @@ module.exports = (sequelize, DataTypes) => {
   Post.init({
     author: DataTypes.INTEGER,
     title: DataTypes.STRING,
-    publish_date: DataTypes.DATE,
+    // publish_date: DataTypes.DATE,
     status: DataTypes.ENUM('active', 'inactive'),
-    content: DataTypes.TEXT,
-    categories: DataTypes.INTEGER,
+    content: DataTypes.STRING,
+    rating: DataTypes.INTEGER,
+    // categories: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Post',
