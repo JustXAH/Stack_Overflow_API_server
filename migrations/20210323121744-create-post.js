@@ -28,15 +28,19 @@ module.exports = {
       status: {
         type: Sequelize.ENUM('active', 'inactive'),
         allowNull: false,
-        efaultValue: 'active'
+        defaultValue: 'active'
       },
       content: {
         type: Sequelize.STRING(1234),
         allowNull: false,
       },
       categories: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+          model: "Categories",
+          key: "id"
+        }
       },
       createdAt: {
         allowNull: false,
