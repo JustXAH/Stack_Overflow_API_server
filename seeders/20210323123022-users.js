@@ -6,7 +6,7 @@ module.exports = {
       {
         login: 'admin',
         password: '$2b$10$0j1veusEMYTXm6YGSbk0teLqMLvbJ6MFYc24kSWsfBEsOoGr4VpEy',
-        full_name: 'Igor Khanenko',
+        full_name: 'Admin Adminovich',
         email: 'usofXAH@gmail.com',
         rating: '666',
         role: 'admin',

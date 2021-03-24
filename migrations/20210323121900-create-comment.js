@@ -8,13 +8,22 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      author: {
+      author_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-          model: "Users",
-          key: "id"
-        }
+        // foreignKey: ,
+        // references: {
+        //   model: "Users",
+        //   key: "id"
+        // }
+      },
+      post_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        // references: {
+        //   model: "Posts",
+        //   key: "id"
+        // }
       },
       // publish_date: {
       //   type: Sequelize.DATE,

@@ -1,6 +1,6 @@
 'use strict';
 
-const User = require('../sequlize').User;
+const { User } = require('../models');
 const { validationResult } = require('express-validator');
 const { registrationFailures } = require('../helpers/errorsOutputFormat')
 const { emailConfirmMessage } = require('../helpers/mailCreators');
@@ -10,7 +10,6 @@ const {
     passwordHashing,
     comparingHashPasswords,
     randomTokenCreator,
-    JwtTokenCreator
 } = require('../helpers/helpers')
 
 async function getAllUsers(req, res) {
@@ -20,14 +19,14 @@ async function getAllUsers(req, res) {
         })
         if (!allUsers)
             res.status(500).json({
-                status: "Database error",
+                status: "error",
                 message: "Unrecognized database error"
             })
         else {
-            res.status(200).json(allUsers)
+            res.status(200).json({ status: "success", data: allUsers })
         }
     } catch (err) {
-        res.status(500).json({error: err});
+        res.status(500).json({ status: "error", message: err });
     }
 }
 
@@ -38,38 +37,40 @@ async function getUserById(req, res) {
         })
         if (!userById)
             res.status(404).json({
-                status: "Request error",
-                message: "User not found by requested params ID"
+                status: "error",
+                message: "User not found by requested param - user ID"
             })
         else {
-            res.status(200).json(userById)
+            res.status(200).json({ status: "success", data: userById })
         }
     } catch (err) {
-        res.status(500).json({error: err});
+        res.status(500).json({ status: "error", message: err });
     }
 }
 
 async function createNewUser(req, res) {
     try {
         const errors = validationResult(req).formatWith(registrationFailures);
-        if (!errors.isEmpty()) {
-            return res.status(400).json(errors.array())
-        }
+        if (!errors.isEmpty())
+            return res.status(400).json({
+                status: "error",
+                errors: errors.array()
+            })
         if (req.user.role !== "admin")
             return res.status(403).json({
-                create_new_user: false,
+                status: "error",
                 message: "Permission denied! Access is allowed only to the admin"
             })
         const userByLogin = await User.findOne({where: {login: req.body.login}})
         if (userByLogin)
             return res.status(403).json({
-                create_new_user: false,
+                status: "error",
                 message: "User with this login already exists"
             })
         const userByEmail = await User.findOne({where: {email: req.body.email}})
         if (userByEmail)
             return res.status(403).json({
-                create_new_user: false,
+                status: "error",
                 message: "User with this email already exists"
             })
         // Hashing password
@@ -86,11 +87,11 @@ async function createNewUser(req, res) {
         // Creating a verification message and sending it to the user email
         sendMail(await emailConfirmMessage(req.body.email, req.body.full_name, confirm_token.token));
         res.status(200).json({
-            create_new_user: true,
+            status: "success",
             message: "New user created successfully"
         });
     } catch (err) {
-        res.status(500).json({error: err});
+        res.status(500).json({ status: "error", message: err });
     }
 }
 
@@ -98,12 +99,12 @@ async function avatarUpload(req, res) {
     try {
         if (req.errorCode === 400)
             return res.status(400).json({
-                avatar_upload: false,
+                status: "error",
                 message: "Incorrect format of the uploaded file. Not an image"
             })
         if (!req.file)
             return res.status(400).json({
-                avatar_upload: false,
+                status: "error",
                 message: "Error loading file"
             })
         if (req.user.avatar !== null)
@@ -114,11 +115,11 @@ async function avatarUpload(req, res) {
             where: { id: req.user.id }
         });
         res.status(200).json({
-            avatar_upload: true,
+            status: "success",
             avatar: req.file.filename
         })
     } catch (err) {
-        res.status(500).json({error: err});
+        res.status(500).json({ status: "error", message: err });
     }
 }
 
@@ -126,30 +127,33 @@ async function updateUserData(req, res) {
     try {
         const errors = validationResult(req).formatWith(registrationFailures);
         if (!errors.isEmpty()) {
-            return res.status(400).json(errors.array())
+            return res.status(400).json({
+                status: "error",
+                errors: errors.array()
+            })
         }
         if (req.user.id !== Number(req.params.user_id) && req.user.role !== "admin")
             return res.status(403).json({
-                update_user_data: false,
+                status: "error",
                 message: "Permission denied! Only the admin can change the data of other users"
             })
         const userById = await User.findByPk(req.params.user_id)
         if (!userById)
             return res.status(404).json({
-                update_user_data: false,
-                message: "User not found by requested params ID"
+                status: "error",
+                message: "User not found by requested param - user ID"
             })
         if (req.body.login !== userById.login
             && await User.findOne({ where: {login: req.body.login} })!== null) {
             return res.status(403).json({
-                update_user_data: false,
+                status: "error",
                 message: "Login is already taken"
             })
         }
         if (req.body.email !== userById.email
             && await User.findOne({ where: {email: req.body.email} })!== null) {
             return res.status(403).json({
-                update_user_data: false,
+                status: "error",
                 message: "Email is already taken"
             })
         }
@@ -183,11 +187,11 @@ async function updateUserData(req, res) {
             where: { id: req.params.user_id }
         });
         res.status(200).json({
-            update_user_data: true,
+            status: "success",
             message: 'Updated user data successfully'
         });
     } catch (err) {
-        res.status(500).json({error: err});
+        res.status(500).json({ status: "error", message: err });
     }
 }
 
@@ -195,22 +199,22 @@ async function deleteUser(req, res) {
     try {
        if (req.user.id !== Number(req.params.user_id) && req.user.role !== "admin")
             return res.status(403).json({
-                delete_user: false,
+                status: "error",
                 message: "Permission denied! Only the admin can change the data of other users"
             })
         const user = await User.findByPk(req.params.user_id);
         if (!user)
             return res.status(404).json({
-                delete_user: false,
-                message: "User not found by requested params ID"
+                status: "error",
+                message: "User not found by requested param - user ID"
             })
         await user.destroy();
         res.status(200).json({
-            delete_user: true,
+            status: "success",
             message: 'User deleted successfully'
         })
     } catch (err) {
-        res.status(500).json({error: err});
+        res.status(500).json({ status: "error", message: err });
     }
 }
 

@@ -8,9 +8,15 @@ const validation = new Validation;
 const imageUploadHandler = require('../middleware/imageUploadHandler')
 const {
     getAllPosts,
+    getPostById,
+    getAllCommentsByPostId,
+    createNewPost,
 } = require('../controllers/posts_controller');
 
-router.get('/', verifyToken, getAllPosts);
+router.get('/', getAllPosts);
+router.get('/:post_id', getPostById);
+router.get('/:post_id/comments', getAllCommentsByPostId);
+router.post('/:post_id/comments', verifyToken, createNewPost);
 // router.get('/:user_id', verifyToken, getUserById);
 // router.post('/', verifyToken, validation.registerDataSchema, createNewUser);
 // router.post('/avatar', verifyToken, imageUploadHandler, avatarUpload);

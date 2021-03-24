@@ -8,13 +8,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      author: {
+      author_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-          model: "Users",
-          key: "id"
-        }
+        // references: {
+        //   model: "Users",
+        //   key: "id"
+        // }
       },
       // publish_date: {
       //   type: Sequelize.DATE,
@@ -25,19 +25,19 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
         defaultValue: null,
-        references: {
-          model: "Posts",
-          key: "id"
-        }
+        // references: {
+        //   model: "Posts",
+        //   key: "id"
+        // }
       },
       comment_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         defaultValue: null,
-        references: {
-          model: "Comments",
-          key: "id"
-        }
+        // references: {
+        //   model: "Comments",
+        //   key: "id"
+        // }
       },
       type: {
         type: Sequelize.ENUM('like', 'dislike'),

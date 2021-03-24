@@ -8,13 +8,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      author: {
+      author_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-          model: "Users",
-          key: "id"
-        }
+        // references: {
+        //   model: "Users",
+        //   key: "id"
+        // }
       },
       title: {
         type: Sequelize.STRING(1234),

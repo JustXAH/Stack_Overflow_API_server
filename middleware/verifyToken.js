@@ -1,7 +1,7 @@
 'use strict';
 
 const jwt  = require('jsonwebtoken');
-const User = require('../sequlize').User;
+const { User } = require('../models');
 
 module.exports = function verifyToken(req, res, next) {
     const authHeader = req.headers.authorization;

@@ -1,8 +1,10 @@
 const { Op, Sequelize } = require('sequelize')
-const Category = require('../sequlize').Category;
+// const Category = require('../sequlize').Category;
 
 
-const paginate = async (model, pageSize, pageLimit, search = {}, filter1 = {}, filter2 = {}, filterStatus = {}, order = {}, transform) => {
+const paginate = async (model, pageSize, pageLimit, search = {},
+                        filter1 = {},  filterStatus = {},
+                        order = {}, transform) => {
     try {
         const limit = parseInt(pageLimit, 10) || 15
         const page = parseInt(pageSize, 10) || 1
@@ -15,14 +17,14 @@ const paginate = async (model, pageSize, pageLimit, search = {}, filter1 = {}, f
             }
         }
 
-        if (filter2 && filter2.length && filter2[0][0] === 'category') {
-            options.include = [{
-                model: Category,
-                as: 'Categories',
-                where: {title: filter2[0][1]},
-                attributes: []
-            }]
-        }
+        // if (filter2 && filter2.length && filter2[0][0] === 'category') {
+        //     options.include = [{
+        //         model: Category,
+        //         as: 'Categories',
+        //         where: {title: filter2[0][1]},
+        //         attributes: []
+        //     }]
+        // }
 
         if (filter1 && filter1.length)
             options.where.createdAt = {[Op.between]: [filter1[0][0], filter1[0][1]]}
@@ -41,6 +43,7 @@ const paginate = async (model, pageSize, pageLimit, search = {}, filter1 = {}, f
             rows = await transform(rows)
 
         return {
+            status: 'success',
             previousPage: getPreviousPage(page),
             currentPage: page,
             nextPage: getNextPage(page, limit, count),
@@ -48,7 +51,8 @@ const paginate = async (model, pageSize, pageLimit, search = {}, filter1 = {}, f
             pages: getTotalPages(count, limit),
             limit,
             filter1,
-            filter2,
+            filterStatus,
+            // filter2,
             data: rows
         }
     } catch (err) {

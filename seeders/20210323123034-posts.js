@@ -4,7 +4,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.bulkInsert('Posts', [
       {
-        author: 1,
+        author_id: 1,
         title: "How can I add admin to my 'Users' table in Sequelize (MySQL)" +
             " Node.js?",
         // publish_date: new Date(Date.now()),
@@ -15,7 +15,7 @@ module.exports = {
         // updatedAt: new Date(Date.now())
       },
       {
-        author: 2,
+        author_id: 2,
         title: "How to install Node.js on Mac?",
         // publish_date: new Date(Date.now()),
         status: 'active',
@@ -26,7 +26,7 @@ module.exports = {
         // updatedAt: new Date(Date.now())
       },
       {
-        author: 2,
+        author_id: 2,
         title: "How to install import settings in WebStorm IDE?",
         // publish_date: new Date(Date.now()),
         status: 'active',
@@ -36,7 +36,7 @@ module.exports = {
         // updatedAt: new Date(Date.now())
       },
       {
-        author: 1,
+        author_id: 1,
         title: "What's the difference between C and C++",
         // publish_date: new Date(Date.now()),
         status: 'active',
@@ -49,7 +49,7 @@ module.exports = {
         // updatedAt: new Date(Date.now())
       },
       {
-        author: 2,
+        author_id: 2,
         title: "Java - Extending Classes",
         // publish_date: new Date(Date.now()),
         status: 'active',
