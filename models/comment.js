@@ -10,12 +10,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Comment.init({
-    id: {
-      primaryKey: true,
-      autoIncrement: true,
-      allowNull: false,
-      type: DataTypes.INTEGER
-    },
+    // id: {
+    //   primaryKey: true,
+    //   autoIncrement: true,
+    //   allowNull: false,
+    //   type: DataTypes.INTEGER
+    // },
     author_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -26,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     content: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    rating: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
   }, {

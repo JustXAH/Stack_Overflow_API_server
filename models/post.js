@@ -13,12 +13,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Post.init({
-    id: {
-      primaryKey: true,
-      autoIncrement: true,
-      allowNull: false,
-      type: DataTypes.INTEGER
-    },
+    // id: {
+    //   primaryKey: true,
+    //   autoIncrement: true,
+    //   allowNull: false,
+    //   type: DataTypes.INTEGER
+    // },
     author_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -29,9 +29,18 @@ module.exports = (sequelize, DataTypes) => {
     },
     title: DataTypes.STRING,
     // publish_date: DataTypes.DATE,
-    status: DataTypes.ENUM('active', 'inactive'),
-    content: DataTypes.STRING,
-    rating: DataTypes.INTEGER,
+    status: {
+      type: DataTypes.ENUM('active', 'inactive'),
+      allowNull: false,
+    },
+    content: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    rating: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     // categories: DataTypes.INTEGER,
   }, {
     sequelize,

@@ -34,6 +34,11 @@ module.exports = {
         type: Sequelize.STRING(1234),
         allowNull: false,
       },
+      rating: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

@@ -16,7 +16,7 @@ class Validation {
                .withMessage('The confirmPassword must match the password field'),
            check('full_name')
                // .exists().withMessage('Full name must exist')
-               .isLength({ min: 1 }).withMessage('Full name is a required field'),
+               .notEmpty().withMessage('Full name is a required field'),
            // .isAlpha().withMessage('Full name must contain only alpha characters'),
            // .isUppercase().withMessage('Must start')
            check('email', 'Invalid email address')
@@ -64,10 +64,48 @@ class Validation {
                .custom((value, { req }) => value === req.body.password)
                .withMessage('The confirmPassword must match the password field'),
            check('full_name')
-               .isLength({ min: 1 }).withMessage('Full name is a required field'),
+               .notEmpty().withMessage('Full name is a required field'),
            check('email', 'Invalid email address')
                .isEmail().normalizeEmail()
        ]
+
+       this.createCommentDataSchema = [
+           check('content', "Field 'content' must exist and cannot be empty")
+               .notEmpty()
+       ]
+
+       this.createPostDataSchema = [
+           check('title', "Field 'title' must exist and cannot be empty")
+               .notEmpty(),
+           check('content', "Field 'content' must exist and cannot be empty")
+               .notEmpty(),
+           check('categories', "Field 'categories' must exist and cannot be" +
+               " empty")
+               .notEmpty()
+               // .custom((value) => {
+               //     console.log(value)
+               //     let cats = value.split(',')
+               //     cats.forEach((cat) => {
+               //         cat === /^[0-9]+$/
+               //     })
+               // }).withMessage('CATEGORIES ERROR')
+               // .withMessage('CATEGORIES ERROR'),
+       ]
+
+       // this.createLikeOrDislikeDataSchema = [
+       //     // check('author_id')
+       //     //     .notEmpty().withMessage("Field 'author_id' must" +
+       //     //     " exist and cannot be empty")
+       //     //     .bail()
+       //     //     .isNumeric().withMessage("Field 'author_id' must contain only" +
+       //     //     " numbers"),
+       //     check('type')
+       //         .notEmpty().withMessage("Field 'type' must exist and cannot" +
+       //         " be empty")
+       //         .bail()
+       //         .custom((value) => value === "like" || value === "dislike")
+       //         .withMessage("The type can be like or dislike"),
+       // ]
    }
 }
 
