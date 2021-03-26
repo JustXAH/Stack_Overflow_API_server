@@ -2,7 +2,7 @@ const { check, body } = require('express-validator');
 
 class Validation {
    constructor(options) {
-       this.registerDataSchema = [
+       this.registerUserDataSchema = [
            check('login')
                .isLength({ min: 4, max: 20}).withMessage('The login must be at least 4 and max 20 chars long')
                .isAlphanumeric().withMessage('Login must be alphanumeric'),
@@ -51,7 +51,7 @@ class Validation {
                .matches(/^(?=.*[A-Z])/).withMessage('The password must contain a minimum of 1 lower case letter [A-Z]'),
        ]
 
-       this.updateDataSchema = [
+       this.updateUserDataSchema = [
            check('login')
                .isLength({ min: 4, max: 20}).withMessage('The login must be at least 4 and max 20 chars long')
                .isAlphanumeric().withMessage('Login must be alphanumeric'),
@@ -69,11 +69,6 @@ class Validation {
                .isEmail().normalizeEmail()
        ]
 
-       this.createCommentDataSchema = [
-           check('content', "Field 'content' must exist and cannot be empty")
-               .notEmpty()
-       ]
-
        this.createPostDataSchema = [
            check('title', "Field 'title' must exist and cannot be empty")
                .notEmpty(),
@@ -82,30 +77,19 @@ class Validation {
            check('categories', "Field 'categories' must exist and cannot be" +
                " empty")
                .notEmpty()
-               // .custom((value) => {
-               //     console.log(value)
-               //     let cats = value.split(',')
-               //     cats.forEach((cat) => {
-               //         cat === /^[0-9]+$/
-               //     })
-               // }).withMessage('CATEGORIES ERROR')
-               // .withMessage('CATEGORIES ERROR'),
        ]
 
-       // this.createLikeOrDislikeDataSchema = [
-       //     // check('author_id')
-       //     //     .notEmpty().withMessage("Field 'author_id' must" +
-       //     //     " exist and cannot be empty")
-       //     //     .bail()
-       //     //     .isNumeric().withMessage("Field 'author_id' must contain only" +
-       //     //     " numbers"),
-       //     check('type')
-       //         .notEmpty().withMessage("Field 'type' must exist and cannot" +
-       //         " be empty")
-       //         .bail()
-       //         .custom((value) => value === "like" || value === "dislike")
-       //         .withMessage("The type can be like or dislike"),
-       // ]
+       this.createCommentDataSchema = [
+           check('content', "Field 'content' must exist and cannot be empty")
+               .notEmpty()
+       ]
+
+       this.createLikeDataSchema = [
+           check('type', "The field 'type' must exist and can be only 'like'" +
+               " or 'dislike'")
+               .custom((value) => value === "like" || value === "dislike")
+               // .withMessage("The type can be only 'like' or 'dislike'"),
+       ]
    }
 }
 

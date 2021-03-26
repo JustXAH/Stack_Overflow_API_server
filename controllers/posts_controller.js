@@ -1,20 +1,16 @@
 'use strict';
 
-const { User, Category, Post, Comment, PostCategory } = require('../models');
+const { User, Category, Post, Comment, PostCategory, Like } = require('../models');
 const { Op } = require('sequelize');
 const Sequelize = require('sequelize');
 const paginate = require('../helpers/pagination');
 const { validationResult } = require('express-validator');
-const { registrationFailures } = require('../helpers/errorsOutputFormat')
-const { emailConfirmMessage } = require('../helpers/mailCreators');
-const sendMail = require('../helpers/sendMail');
-const deletePrevAvatar = require('../helpers/deletePrevAvatar')
 const {
-    passwordHashing,
-    comparingHashPasswords,
-    randomTokenCreator,
-    JwtTokenCreator
-} = require('../helpers/helpers')
+    newCommentFailures,
+    newPostFailures,
+    newLikeFailures
+} = require('../helpers/errorsOutputFormat')
+
 
 async function getAllPosts(req, res) {
     try {
@@ -58,7 +54,7 @@ async function getAllPosts(req, res) {
         // transform function that can be passed to the  paginate method
         const transform = async (posts) => {
             return await Promise.all(posts.map( async post => {
-                const user = await User.findOne( { where: {id: post.author} })
+                const user = await User.findOne( { where: { id: post.author } })
                 return {
                     id: post.id,
                     title: post.title,
@@ -89,7 +85,8 @@ async function getAllPosts(req, res) {
 
 async function getPostById(req, res) {
     try {
-        const postById = await Post.findByPk(req.params.post_id);
+        const postId = Number(req.params.post_id);
+        const postById = await Post.findByPk(postId);
 
         if (!postById) {
             return res.status(404).json({
@@ -106,7 +103,8 @@ async function getPostById(req, res) {
 
 async function getAllCommentsByPostId(req, res) {
     try {
-        const postById = await Post.findByPk(Number(req.params.post_id));
+        const postId = Number(req.params.post_id);
+        const postById = await Post.findByPk(postId);
 
         if (!postById)
             return res.status(404).json({
@@ -115,13 +113,12 @@ async function getAllCommentsByPostId(req, res) {
             })
 
         let comments = await Comment.findAll({
-            where: { post_id: req.params.post_id },
+            where: { post_id: postId },
             include: [{
                 model: User,
                 required: true,
                 attributes: ["full_name"],
             }],
-
         });
 
         if (Object.keys(comments).length === 0)
@@ -135,7 +132,8 @@ async function getAllCommentsByPostId(req, res) {
 
 async function getAllCategoriesByPostId(req, res) {
     try {
-        const postById = await Post.findByPk(Number(req.params.post_id));
+        const postId = Number(req.params.post_id);
+        const postById = await Post.findByPk(postId);
 
         if (!postById)
             return res.status(404).json({
@@ -148,7 +146,7 @@ async function getAllCategoriesByPostId(req, res) {
             include: [
                 {
                     model: PostCategory,
-                    where: { post_id: req.params.post_id },
+                    where: { post_id: postId },
                     required: true,
                     attributes: [],
                     include: [
@@ -169,43 +167,6 @@ async function getAllCategoriesByPostId(req, res) {
 
 async function getAllLikesByPostId(req, res) {
     try {
-        const postById = await Post.findByPk(Number(req.params.post_id));
-
-        if (!postById)
-            return res.status(404).json({
-                status: "error",
-                message: "Post not found by requested param - post ID"
-            })
-
-        // let comments = await Comment.findAll({
-        //     where: { post_id: req.params.post_id },
-        //     include: [{
-        //         model: User,
-        //         required: true,
-        //         attributes: ["full_name"],
-        //     }],
-        //
-        // });
-
-        // if (Object.keys(comments).length === 0)
-        //     comments = null;
-
-        res.status(200).json({ status: "success", data: comments });
-    } catch (err) {
-        res.status(500).json({ status: "error", message: err });
-    }
-}
-
-async function createNewComment(req, res) {
-    try {
-        const errors = validationResult(req).formatWith(registrationFailures);
-
-        if (!errors.isEmpty())
-            return res.status(400).json({
-                status: "error",
-                errors: errors.array()
-            })
-
         const postId = Number(req.params.post_id);
         const postById = await Post.findByPk(postId);
 
@@ -215,16 +176,19 @@ async function createNewComment(req, res) {
                 message: "Post not found by requested param - post ID"
             })
 
-        await Comment.create({
-            author_id: req.user.id,
-            post_id: postId,
-            content: req.body.content
+        let likes = await Like.findAll({
+            where: { post_id: postId },
+            include: [{
+                model: User,
+                required: true,
+                attributes: ["full_name"],
+            }],
         });
 
-        res.status(200).json({
-            status: "success",
-            message: "New comment created successfully"
-        });
+        if (Object.keys(likes).length === 0)
+            likes = null;
+
+        res.status(200).json({ status: "success", data: likes });
     } catch (err) {
         res.status(500).json({ status: "error", message: err });
     }
@@ -232,7 +196,7 @@ async function createNewComment(req, res) {
 
 async function createNewPost(req, res) {
     try {
-        const errors = validationResult(req).formatWith(registrationFailures);
+        const errors = validationResult(req).formatWith(newPostFailures);
 
         if (!errors.isEmpty())
             return res.status(400).json({
@@ -264,9 +228,110 @@ async function createNewPost(req, res) {
     }
 }
 
+async function createNewComment(req, res) {
+    try {
+        const errors = validationResult(req).formatWith(newCommentFailures);
+
+        if (!errors.isEmpty())
+            return res.status(400).json({
+                status: "error",
+                errors: errors.array()
+            })
+
+        const postId = Number(req.params.post_id);
+        const postById = await Post.findByPk(postId);
+
+        if (!postById)
+            return res.status(404).json({
+                status: "error",
+                message: "Post not found by requested param - post ID"
+            })
+
+        await Comment.create({
+            author_id: req.user.id,
+            post_id: postId,
+            content: req.body.content
+        });
+
+        res.status(200).json({
+            status: "success",
+            message: "New comment created successfully"
+        });
+    } catch (err) {
+        res.status(500).json({ status: "error", message: err });
+    }
+}
+
 async function createNewLike(req, res) {
     try {
-        const errors = validationResult(req).formatWith(registrationFailures);
+        const errors = validationResult(req).formatWith(newLikeFailures);
+
+        if (!errors.isEmpty())
+            return res.status(400).json({
+                status: "error",
+                errors: errors.array()
+            })
+
+        const postId = Number(req.params.post_id);
+        const postById = await Post.findByPk(postId);
+        const type = req.body.type;
+
+        if (!postById)
+            return res.status(404).json({
+                status: "error",
+                message: "Post not found by requested param - post ID"
+            })
+
+        const likeExist = await Like.findOne({
+            where: {
+                author_id: req.user.id,
+                post_id: postId
+            }
+        });
+
+        if (likeExist && likeExist.type === type) {
+            return res.status(403).json({
+                status: "error",
+                message: `The post has already been ${type}d. You cannot ${type} this post again`
+            })
+        }
+
+        let updateValue;
+
+        // update like type if exist or create new if doesn't exist
+        if (likeExist && likeExist.type !== type) {
+            updateValue = 2;
+
+            likeExist.type = type;
+            likeExist.updatedAt = new Date(Date.now());
+            await likeExist.save();
+        } else {
+            updateValue = 1;
+
+            await Like.create({
+                author_id: req.user.id,
+                post_id: postId,
+                type: type
+            })
+        }
+        // update post rating
+        if (type === 'like') {
+            await postById.increment('rating', {by: updateValue});
+        } else {
+            await postById.decrement('rating', {by: updateValue});
+        }
+        res.status(200).json({
+            status: "success",
+            message: `New ${type} created successfully`
+        });
+    } catch (err) {
+        res.status(500).json({ status: "error", message: err });
+    }
+}
+
+async function updatePost(req, res) {
+    try {
+        const errors = validationResult(req).formatWith(newPostFailures);
 
         if (!errors.isEmpty())
             return res.status(400).json({
@@ -291,19 +356,36 @@ async function createNewLike(req, res) {
 
         res.status(200).json({
             status: "success",
-            message: "New post created successfully"
+            message: "Post updated successfully"
         });
     } catch (err) {
         res.status(500).json({ status: "error", message: err });
     }
 }
 
-async function createNewLike(req, res) {
+async function deletePost(req, res) {
     try {
+        const postId = Number(req.params.post_id);
+        const postById = await Post.findByPk(postId);
 
         res.status(200).json({
             status: "success",
-            message: "New post created successfully"
+            message: "Post deleted successfully"
+        });
+    } catch (err) {
+        res.status(500).json({ status: "error", message: err });
+    }
+}
+
+async function deleteLike(req, res) {
+    try {
+        const postId = Number(req.params.post_id);
+        const postById = await Post.findByPk(postId);
+        const type = req.body.type;
+
+        res.status(200).json({
+            status: "success",
+            message: `${type} deleted successfully`
         });
     } catch (err) {
         res.status(500).json({ status: "error", message: err });
@@ -318,8 +400,9 @@ module.exports = {
     getAllCommentsByPostId,
     getAllCategoriesByPostId,
     getAllLikesByPostId,
-    createNewComment,
     createNewPost,
+    createNewComment,
     createNewLike,
-    createNewDislike,
+    updatePost,
+    deletePost,
 };

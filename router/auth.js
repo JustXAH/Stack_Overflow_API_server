@@ -16,7 +16,7 @@ const {
 } = require('../controllers/auth_controller');
 
 router.get('/register/email-confirm/:confirm_token', email_confirmation);
-router.post('/register', validation.registerDataSchema, register);
+router.post('/register', validation.registerUserDataSchema, register);
 router.post('/login', validation.loginDataSchema, login);
 router.post('/logout', verifyToken, logout);
 router.post('/password-reset', validation.forgotPassDataSchema, forgotPassword);

@@ -17,9 +17,9 @@ const {
 
 router.get('/', verifyToken, getAllUsers);
 router.get('/:user_id', verifyToken, getUserById);
-router.post('/', verifyToken, validation.registerDataSchema, createNewUser);
+router.post('/', verifyToken, validation.registerUserDataSchema, createNewUser);
 router.post('/avatar', verifyToken, imageUploadHandler, avatarUpload);
-router.patch('/:user_id', verifyToken, validation.updateDataSchema, updateUserData);
+router.patch('/:user_id', verifyToken, validation.updateUserDataSchema, updateUserData);
 router.delete('/:user_id', verifyToken, deleteUser);
 
 module.exports = router;

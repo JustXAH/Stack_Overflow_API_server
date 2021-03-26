@@ -48,9 +48,48 @@ const resetPassFailures = ({location, msg, param, value}) => {
     }
 };
 
+const newPostFailures = ({location, msg, param, value}) => {
+    return {
+        type: "Error",
+        status: "400 Bad Request",
+        name: "Create new post Failure",
+        location: location,
+        param: param,
+        message: msg,
+        value: value,
+    }
+};
+
+const newCommentFailures = ({location, msg, param, value}) => {
+    return {
+        type: "Error",
+        status: "400 Bad Request",
+        name: "Create new comment Failure",
+        location: location,
+        param: param,
+        message: msg,
+        value: value,
+    }
+};
+
+const newLikeFailures = ({location, msg, param, value}) => {
+    return {
+        type: "Error",
+        status: "400 Bad Request",
+        name: "Create new like or dislike Failure",
+        location: location,
+        param: param,
+        message: msg,
+        value: value,
+    }
+};
+
 module.exports = {
     registrationFailures,
     loginFailures,
     forgotPassFailures,
-    resetPassFailures
+    resetPassFailures,
+    newPostFailures,
+    newCommentFailures,
+    newLikeFailures
 }
