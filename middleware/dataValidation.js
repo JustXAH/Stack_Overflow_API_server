@@ -90,6 +90,18 @@ class Validation {
                .custom((value) => value === "like" || value === "dislike")
                // .withMessage("The type can be only 'like' or 'dislike'"),
        ]
+
+       this.updatePostDataSchema = [
+           check('title', "Field 'title' cannot be empty")
+               .if(body('title').exists())
+               .notEmpty(),
+           check('content', "Field 'content' cannot be empty")
+               .if(body('content').exists())
+               .notEmpty(),
+           check('category', "Field 'categories' cannot be empty")
+               .if(body('category').exists())
+               .notEmpty()
+       ]
    }
 }
 

@@ -339,20 +339,51 @@ async function updatePost(req, res) {
                 errors: errors.array()
             })
 
-        // const newPost = await Post.create({
-        //     author_id: req.user.id,
-        //     title: req.body.title,
-        //     content: req.body.content,
-        // })
-        //
-        // const categories = req.body.categories.split(',');
-        //
-        // categories.forEach((category) => {
-        //     PostCategory.create({
-        //         post_id: newPost.id,
-        //         category_id: category
-        //     })
-        // });
+        const {title, content, category} = req.body;
+
+        if (!title && !content && !category)
+            return res.status(400).json({
+                status: "error",
+                message: "No data to update the post"
+            })
+
+        const postId = Number(req.params.post_id);
+        const postById = await Post.findByPk(postId);
+
+        if (!postById)
+            return res.status(404).json({
+                status: "error",
+                message: "Post not found by requested param - post ID"
+            })
+
+        if (postById.author_id !== req.user.id && req.user.role !== 'admin')
+            return res.status(403).json({
+                status: "error",
+                message: "Only the creator of the post or admin can update this post"
+            })
+
+        // сделать params и push!
+
+        if (title)
+            postById.title = title;
+        if (content)
+            postById.content = content;
+
+        postById.updatedAt = new Date(Date.now());
+        postById.save();
+
+        if (category) {
+            const newCategories = category.split(',');
+
+            await PostCategory.destroy({ where: {post_id: postId } });
+
+            newCategories.forEach((newCategory) => {
+                PostCategory.create({
+                    post_id: postId,
+                    category_id: newCategory
+                })
+            });
+        }
 
         res.status(200).json({
             status: "success",

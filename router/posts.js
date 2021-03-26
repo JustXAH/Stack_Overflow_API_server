@@ -28,7 +28,7 @@ router.post('/', verifyToken, validation.createPostDataSchema, createNewPost);
 router.post('/:post_id/comments', verifyToken, validation.createCommentDataSchema, createNewComment);
 router.post('/:post_id/like', verifyToken, validation.createLikeDataSchema, createNewLike);
 
-router.patch('/:post_id', verifyToken, validation.createLikeDataSchema, createNewLike);
+router.patch('/:post_id', verifyToken, validation.updatePostDataSchema, updatePost);
 
 router.delete('/:post_id', verifyToken, validation.createLikeDataSchema, createNewLike);
 router.delete('/:post_id', verifyToken, validation.createLikeDataSchema, createNewLike);

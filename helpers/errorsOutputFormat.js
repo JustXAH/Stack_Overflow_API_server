@@ -84,6 +84,18 @@ const newLikeFailures = ({location, msg, param, value}) => {
     }
 };
 
+const updatePostDataFailures = ({location, msg, param, value}) => {
+    return {
+        type: "Error",
+        status: "400 Bad Request",
+        name: "Update post data Failure",
+        location: location,
+        param: param,
+        message: msg,
+        value: value,
+    }
+};
+
 module.exports = {
     registrationFailures,
     loginFailures,
@@ -91,5 +103,6 @@ module.exports = {
     resetPassFailures,
     newPostFailures,
     newCommentFailures,
-    newLikeFailures
+    newLikeFailures,
+    updatePostDataFailures
 }
