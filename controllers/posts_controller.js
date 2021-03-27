@@ -2,13 +2,14 @@
 
 const { User, Category, Post, Comment, PostCategory, Like } = require('../models');
 const { Op } = require('sequelize');
-const Sequelize = require('sequelize');
+// const Sequelize = require('sequelize');
 const paginate = require('../helpers/pagination');
 const { validationResult } = require('express-validator');
 const {
     newCommentFailures,
     newPostFailures,
-    newLikeFailures
+    newLikeFailures,
+    removeLikeFailures
 } = require('../helpers/errorsOutputFormat')
 
 
@@ -54,7 +55,7 @@ async function getAllPosts(req, res) {
         // transform function that can be passed to the  paginate method
         const transform = async (posts) => {
             return await Promise.all(posts.map( async post => {
-                const user = await User.findOne( { where: { id: post.author } })
+                const user = await User.findByPk(post.author)
                 return {
                     id: post.id,
                     title: post.title,
@@ -362,20 +363,21 @@ async function updatePost(req, res) {
                 message: "Only the creator of the post or admin can update this post"
             })
 
-        // сделать params и push!
-
         if (title)
             postById.title = title;
         if (content)
             postById.content = content;
 
-        postById.updatedAt = new Date(Date.now());
-        postById.save();
+        await Post.update({
+            title: postById.title,
+            content: postById.content,
+            updatedAt: new Date(Date.now())
+        }, { where: { id: postId} })
 
         if (category) {
             const newCategories = category.split(',');
 
-            await PostCategory.destroy({ where: {post_id: postId } });
+            await PostCategory.destroy({ where: { post_id: postId } });
 
             newCategories.forEach((newCategory) => {
                 PostCategory.create({
@@ -399,6 +401,21 @@ async function deletePost(req, res) {
         const postId = Number(req.params.post_id);
         const postById = await Post.findByPk(postId);
 
+        if (!postById)
+            return res.status(404).json({
+                status: "error",
+                message: "Post not found by requested param - post ID"
+            })
+
+        if (postById.author_id !== req.user.id && req.user.role !== 'admin')
+            return res.status(403).json({
+                status: "error",
+                message: "Only the creator of the post or admin can delete this post"
+            })
+
+        await postById.destroy();
+        await PostCategory.destroy({ where: { post_id: postId} });
+
         res.status(200).json({
             status: "success",
             message: "Post deleted successfully"
@@ -410,9 +427,48 @@ async function deletePost(req, res) {
 
 async function deleteLike(req, res) {
     try {
+        const errors = validationResult(req).formatWith(removeLikeFailures);
+
+        if (!errors.isEmpty())
+            return res.status(400).json({
+                status: "error",
+                errors: errors.array()
+            })
+
         const postId = Number(req.params.post_id);
         const postById = await Post.findByPk(postId);
         const type = req.body.type;
+
+        if (!postById)
+            return res.status(404).json({
+                status: "error",
+                message: "Post not found by requested param - post ID"
+            })
+
+        const likeExist = await Like.findOne({
+            where: {
+                author_id: req.user.id,
+                post_id: postId,
+                type: type
+            }
+        });
+
+        if (!likeExist) {
+            return res.status(403).json({
+                status: "error",
+                message: `This ${type} doesn't exist`
+            })
+        }
+
+        // delete like or dislike
+        likeExist.destroy();
+
+        // update post rating
+        if (type === 'like') {
+            await postById.decrement('rating');
+        } else {
+            await postById.increment('rating');
+        }
 
         res.status(200).json({
             status: "success",
@@ -436,4 +492,5 @@ module.exports = {
     createNewLike,
     updatePost,
     deletePost,
+    deleteLike
 };

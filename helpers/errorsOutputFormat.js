@@ -84,6 +84,18 @@ const newLikeFailures = ({location, msg, param, value}) => {
     }
 };
 
+const removeLikeFailures = ({location, msg, param, value}) => {
+    return {
+        type: "Error",
+        status: "400 Bad Request",
+        name: "Remove like or dislike Failure",
+        location: location,
+        param: param,
+        message: msg,
+        value: value,
+    }
+};
+
 const updatePostDataFailures = ({location, msg, param, value}) => {
     return {
         type: "Error",
@@ -104,5 +116,6 @@ module.exports = {
     newPostFailures,
     newCommentFailures,
     newLikeFailures,
+    removeLikeFailures,
     updatePostDataFailures
 }

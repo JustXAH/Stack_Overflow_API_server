@@ -13,7 +13,8 @@ module.exports = {
         allowNull: false,
         // references: {
         //   model: "Posts",
-        //   key: "id"
+        //   key: "id",
+        //   onDelete: "CASCADE"
         // }
       },
       category_id: {
@@ -21,7 +22,8 @@ module.exports = {
         allowNull: false,
         // references: {
         //   model: "Categories",
-        //   key: "id"
+        //   key: "id",
+        //   onDelete: "CASCADE"
         // }
       },
     });

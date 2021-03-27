@@ -84,7 +84,7 @@ class Validation {
                .notEmpty()
        ]
 
-       this.createLikeDataSchema = [
+       this.LikeDataSchema = [
            check('type', "The field 'type' must exist and can be only 'like'" +
                " or 'dislike'")
                .custom((value) => value === "like" || value === "dislike")

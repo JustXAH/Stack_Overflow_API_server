@@ -15,6 +15,8 @@ const {
     createNewComment,
     createNewLike,
     updatePost,
+    deletePost,
+    deleteLike
 } = require('../controllers/posts_controller');
 
 
@@ -26,12 +28,12 @@ router.get('/:post_id/like', verifyToken, getAllLikesByPostId);
 
 router.post('/', verifyToken, validation.createPostDataSchema, createNewPost);
 router.post('/:post_id/comments', verifyToken, validation.createCommentDataSchema, createNewComment);
-router.post('/:post_id/like', verifyToken, validation.createLikeDataSchema, createNewLike);
+router.post('/:post_id/like', verifyToken, validation.LikeDataSchema, createNewLike);
 
 router.patch('/:post_id', verifyToken, validation.updatePostDataSchema, updatePost);
 
-router.delete('/:post_id', verifyToken, validation.createLikeDataSchema, createNewLike);
-router.delete('/:post_id', verifyToken, validation.createLikeDataSchema, createNewLike);
+router.delete('/:post_id', verifyToken, deletePost);
+router.delete('/:post_id/like', verifyToken, validation.LikeDataSchema, deleteLike);
 // router.get('/:user_id', verifyToken, getUserById);
 // router.post('/', verifyToken, validation.registerDataSchema, createNewUser);
 // router.post('/avatar', verifyToken, imageUploadHandler, avatarUpload);
