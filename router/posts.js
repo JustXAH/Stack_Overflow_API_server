@@ -34,10 +34,5 @@ router.patch('/:post_id', verifyToken, validation.updatePostDataSchema, updatePo
 
 router.delete('/:post_id', verifyToken, deletePost);
 router.delete('/:post_id/like', verifyToken, validation.LikeDataSchema, deleteLike);
-// router.get('/:user_id', verifyToken, getUserById);
-// router.post('/', verifyToken, validation.registerDataSchema, createNewUser);
-// router.post('/avatar', verifyToken, imageUploadHandler, avatarUpload);
-// router.patch('/:user_id', verifyToken, validation.updateDataSchema, updateUserData);
-// router.delete('/:user_id', verifyToken, deleteUser);
 
 module.exports = router;

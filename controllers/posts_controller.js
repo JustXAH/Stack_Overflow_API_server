@@ -2,7 +2,6 @@
 
 const { User, Category, Post, Comment, PostCategory, Like } = require('../models');
 const { Op } = require('sequelize');
-// const Sequelize = require('sequelize');
 const paginate = require('../helpers/pagination');
 const { validationResult } = require('express-validator');
 const {
@@ -318,8 +317,10 @@ async function createNewLike(req, res) {
         // update post rating
         if (type === 'like') {
             await postById.increment('rating', {by: updateValue});
+            await User.increment('rating', {by: updateValue, where: { id: postById.author_id } });
         } else {
             await postById.decrement('rating', {by: updateValue});
+            await User.decrement('rating', {by: updateValue, where: { id: postById.author_id } });
         }
         res.status(200).json({
             status: "success",
@@ -466,8 +467,10 @@ async function deleteLike(req, res) {
         // update post rating
         if (type === 'like') {
             await postById.decrement('rating');
+            await req.user.decrement('rating')
         } else {
             await postById.increment('rating');
+            await req.user.increment('rating')
         }
 
         res.status(200).json({
