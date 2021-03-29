@@ -2,7 +2,7 @@
 
 const { User, Category, Post, Comment, PostCategory, Like } = require('../models');
 const { Op } = require('sequelize');
-// const paginate = require('../helpers/pagination');
+const { paginateCategories } = require('../helpers/pagination');
 const { validationResult } = require('express-validator');
 const {
     newCommentFailures,
@@ -11,39 +11,144 @@ const {
     removeLikeFailures
 } = require('../helpers/errorsOutputFormat')
 
-const paginate = require('express-paginate');
+async function getAllCategories (req, res) {
+    try {
+        // get the query params
+        const { page, limit } = req.query
+        let { order_by, order_direction } = req.query
+        let order = [];
 
-async function getAllCategories (req, res, next) {
-    // try {
-        let { page, limit, order } = req.query;
+        if (order_by !== "id" && order_by !== 'title'
+            && order_by !== "createdAt" && order_by !== 'updatedAt')
+            order_by = "id";
+        if (order_direction !== "desc" && order_direction !== "asc")
+            order_direction = "asc";
 
-        if (!limit) {
-            limit = 2;
+        // add the order parameters to the order
+        if (order_by && order_direction)
+            order.push([order_by, order_direction]);
+
+        // transform function that can be passed to the  paginate method
+        const transform = async (categories) => {
+            return await Promise.all(categories.map( async category => {
+                return {
+                    id: category.id,
+                    title: category.title,
+                    description: category.description,
+                    publish_date: category.createdAt,
+                    last_update: category.updatedAt
+                }
+            }))
         }
-        if (!page)
-            page = 1;
+        // paginate method that takes in the model, page, limit, search object, order and transform
+        const allCategories = await paginateCategories(Category, page, limit, order, transform)
 
-        await Category.findAndCountAll(
-            {
-                limit: limit,
-                offset: req.skip,
-                order: [['id', 'ASC']],
-            }).then(results => {
-                const itemCount = results.count;
-                const pageCount = Math.ceil(results.count / req.query.limit);
-                res.status(200).json({
-                    success: true,
-                    data: results,
-                    pageCount,
-                    itemCount,
-                    pages: paginate.getArrayPages(req)(3, pageCount, page)
-                });
-            }).catch(err => next(err))
-    // } catch (err) {
-    //     res.status(500).json({ status: "error", message: err });
-    // }
+        if (!allCategories) {
+            return res.status(404).json({
+                status: "error",
+                message: "Categories not found"
+            })
+        } else {
+            res.status(200).json(allCategories)
+        }
+    } catch (err) {
+        res.status(500).json({ status: "error", message: err });
+    }
+}
+
+async function getCategoryById(req, res) {
+    try {
+        const categoryId = Number(req.params.category_id);
+        const categoryById = await Category.findByPk(categoryId);
+
+        if (!categoryById) {
+            return res.status(404).json({
+                status: "error",
+                message: "Category not found by requested param - category ID"
+            })
+        } else {
+            res.status(200).json({ status: "success", data: categoryById })
+        }
+    } catch (err) {
+        res.status(500).json({ status: "error", message: err });
+    }
+}
+
+async function getAllPostsByCategoryId(req, res) {
+    try {
+        const categoryId = Number(req.params.category_id);
+        const CategoryById = await Category.findByPk(categoryId);
+
+        if (!CategoryById)
+            return res.status(404).json({
+                status: "error",
+                message: "Category not found by requested param - category ID"
+            })
+
+        let postByCategoryId = await Post.findAll({
+            include: [{
+                model: PostCategory,
+                where: { category_id: categoryId },
+                required: true,
+                attributes: [],
+            }]
+        })
+
+        if (Object.keys(postByCategoryId).length === 0)
+            postByCategoryId = null;
+
+        res.status(200).json({ status: "success", data: postByCategoryId });
+    } catch (err) {
+        res.status(500).json({ status: "error", message: err });
+    }
+}
+
+async function createNewCategory(req, res) {
+    try {
+        const errors = validationResult(req).formatWith(newPostFailures);
+
+        if (!errors.isEmpty())
+            return res.status(400).json({
+                status: "error",
+                errors: errors.array()
+            })
+
+        if (req.user.role !== 'admin')
+            return res.status(403).json({
+                status: "error",
+                message: "Permission denied! Only admin can create new category"
+            })
+
+        const title = req.body.title;
+        const category = await Category.findOne({ where: { title: title } });
+
+        if (category)
+            return res.status(403).json({
+                status: "error",
+                message: "Category with this title already exist"
+            })
+
+        let description = req.body.description;
+        if (!description)
+            description = null;
+
+        await Category.create({
+            title: title,
+            description: description,
+        })
+
+        res.status(200).json({
+            status: "success",
+            message: "New category created successfully"
+        });
+    } catch (err) {
+        res.status(500).json({ status: "error", message: err });
+    }
 }
 
 module.exports = {
     getAllCategories,
+    getCategoryById,
+    getAllPostsByCategoryId,
+    createNewCategory,
 }

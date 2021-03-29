@@ -7,11 +7,17 @@ const { Validation } = require('../middleware/dataValidation')
 const validation = new Validation;
 const {
     getAllCategories,
+    getCategoryById,
+    getAllPostsByCategoryId,
+    createNewCategory,
 } = require('../controllers/categories_controller');
 
 
 router.get('/', getAllCategories);
-// router.get('/:post_id', getPostById);
+router.get('/:category_id', getCategoryById);
+router.get('/:category_id/posts', getAllPostsByCategoryId);
+
+router.post('/', verifyToken, validation.createCategorySchema, createNewCategory);
 // router.get('/:post_id/comments', getAllCommentsByPostId);
 // router.get('/:post_id/categories', verifyToken, getAllCategoriesByPostId);
 // router.get('/:post_id/like', verifyToken, getAllLikesByPostId);
