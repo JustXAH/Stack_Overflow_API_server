@@ -77,9 +77,9 @@ async function getCategoryById(req, res) {
 async function getAllPostsByCategoryId(req, res) {
     try {
         const categoryId = Number(req.params.category_id);
-        const CategoryById = await Category.findByPk(categoryId);
+        const categoryById = await Category.findByPk(categoryId);
 
-        if (!CategoryById)
+        if (!categoryById)
             return res.status(404).json({
                 status: "error",
                 message: "Category not found by requested param - category ID"
@@ -146,9 +146,106 @@ async function createNewCategory(req, res) {
     }
 }
 
+async function updateCategory(req, res) {
+    try {
+        const errors = validationResult(req).formatWith(newPostFailures);
+
+        if (!errors.isEmpty())
+            return res.status(400).json({
+                status: "error",
+                errors: errors.array()
+            })
+
+        const {title, content, category} = req.body;
+
+        if (!title && !content && !category)
+            return res.status(400).json({
+                status: "error",
+                message: "No data to update the post"
+            })
+
+        const postId = Number(req.params.post_id);
+        const postById = await Post.findByPk(postId);
+
+        if (!postById)
+            return res.status(404).json({
+                status: "error",
+                message: "Post not found by requested param - post ID"
+            })
+
+        if (postById.author_id !== req.user.id && req.user.role !== 'admin')
+            return res.status(403).json({
+                status: "error",
+                message: "Only the creator of the post or admin can update this post"
+            })
+
+        if (title)
+            postById.title = title;
+        if (content)
+            postById.content = content;
+
+        await Post.update({
+            title: postById.title,
+            content: postById.content,
+            updatedAt: new Date(Date.now())
+        }, { where: { id: postId} })
+
+        if (category) {
+            const newCategories = category.split(',');
+
+            await PostCategory.destroy({ where: { post_id: postId } });
+
+            newCategories.forEach((newCategory) => {
+                PostCategory.create({
+                    post_id: postId,
+                    category_id: newCategory
+                })
+            });
+        }
+
+        res.status(200).json({
+            status: "success",
+            message: "Post updated successfully"
+        });
+    } catch (err) {
+        res.status(500).json({ status: "error", message: err });
+    }
+}
+
+async function deleteCategory(req, res) {
+    try {
+        if (req.user.role !== 'admin')
+            return res.status(403).json({
+                status: "error",
+                message: "Permission denied! Only admin can delete category"
+            })
+
+        const categoryId = Number(req.params.category_id);
+        const categoryById = await Category.findByPk(categoryId);
+
+        if (!categoryById)
+            return res.status(404).json({
+                status: "error",
+                message: "Category not found by requested param - category ID"
+            })
+
+        await categoryById.destroy();
+        await PostCategory.destroy({ where: { category_id: categoryId } });
+
+        res.status(200).json({
+            status: "success",
+            message: "Category deleted successfully"
+        });
+    } catch (err) {
+        res.status(500).json({ status: "error", message: err });
+    }
+}
+
 module.exports = {
     getAllCategories,
     getCategoryById,
     getAllPostsByCategoryId,
     createNewCategory,
+    updateCategory,
+    deleteCategory
 }
