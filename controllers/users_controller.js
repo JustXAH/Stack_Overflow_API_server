@@ -1,11 +1,12 @@
 'use strict';
 
-const { User } = require('../models');
+const { User, Post, Comment } = require('../models');
 const { validationResult } = require('express-validator');
 const { registrationFailures } = require('../helpers/errorsOutputFormat')
 const { emailConfirmMessage } = require('../helpers/mailCreators');
 const sendMail = require('../helpers/sendMail');
 const deletePrevAvatar = require('../helpers/deletePrevAvatar')
+const sequelize = require('sequelize');
 const {
     passwordHashing,
     comparingHashPasswords,
@@ -41,6 +42,44 @@ async function getUserById(req, res) {
                 message: "User not found by requested param - user ID"
             })
         else {
+            // update user rating
+            let userRating = 0;
+            const UserPostRatings = await Post.findAll({
+                where: { author_id: req.params.user_id },
+                attributes: [
+                    'rating',
+                    [sequelize.fn('sum', sequelize.col('rating')), 'total'],
+                ],
+                group: ['Post.id'],
+                raw: true,
+            });
+            const UserCommentRatings = await Comment.findAll({
+                where: { author_id: req.params.user_id },
+                attributes: [
+                    'rating',
+                    [ sequelize.fn('sum', sequelize.col('rating')), 'total' ],
+                ],
+                group: ['Comment.id'],
+                raw: true,
+            });
+            console.log("=====POSTS=====")
+            UserPostRatings.forEach((post) => {
+                userRating = post.rating + userRating;
+                console.log(post.rating)
+                console.log(userRating)
+            })
+            console.log("=====COMMENTS=====")
+            UserCommentRatings.forEach((comment) => {
+                userRating = comment.rating + userRating;
+                console.log(comment.rating)
+                console.log(userRating)
+            })
+            // console.log(test);
+            console.log("=====TOTAL=====")
+            console.log(userRating);
+            await userById.increment('rating', { by: userRating });
+            userById.rating = userRating;
+
             res.status(200).json({ status: "success", data: userById })
         }
     } catch (err) {
