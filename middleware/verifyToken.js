@@ -10,7 +10,7 @@ module.exports = function verifyToken(req, res, next) {
         jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, payload) => {
             if (err) {
                 return res.status(401).json({
-                    status: "Authorization error",
+                    status: "error",
                     message: "Invalid token or token expired"
                 });
             }
@@ -20,7 +20,7 @@ module.exports = function verifyToken(req, res, next) {
             });
             if (!user)
                 return res.status(401).json({
-                    status: "Authorization error",
+                    status: "error",
                     message: "The user who owns this token no longer exists"
                 });
             req.user = user;
@@ -28,7 +28,7 @@ module.exports = function verifyToken(req, res, next) {
         });
     } else {
         return res.status(401).json({
-            status: "Authorization error",
+            status: "error",
             message: "No content in 'Authorization' header"
         });
     }

@@ -5,9 +5,9 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class Like extends Model {
     static associate(models) {
-      Like.belongsTo(models.User, {foreignKey: 'author_id'});
-      Like.belongsTo(models.Post, {foreignKey: 'post_id'});
-      Like.belongsTo(models.Comment, {foreignKey: 'comment_id'});
+      Like.belongsTo(models.User, { foreignKey: 'author_id' });
+      Like.belongsTo(models.Post, { foreignKey: 'post_id' });
+      Like.belongsTo(models.Comment, { onDelete: 'CASCADE', foreignKey: 'comment_id' });
     }
   };
   Like.init({

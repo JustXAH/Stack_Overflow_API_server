@@ -1,7 +1,6 @@
 'use strict';
 
-const { User, Category, Post, Comment, PostCategory, Like } = require('../models');
-const { Op } = require('sequelize');
+const { Category, Post, PostCategory } = require('../models');
 const { paginateCategories } = require('../helpers/pagination');
 const { validationResult } = require('express-validator');
 const {
@@ -39,7 +38,7 @@ async function getAllCategories (req, res) {
             }))
         }
         // paginate method that takes in the model, page, limit, search object, order and transform
-        const allCategories = await paginateCategories(Category, page, limit, order, transform)
+        const allCategories = await paginateCategories(page, limit, order, transform)
 
         if (!allCategories) {
             return res.status(404).json({

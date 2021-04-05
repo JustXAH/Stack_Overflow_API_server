@@ -132,6 +132,18 @@ const updateCategoryFailures = ({location, msg, param, value}) => {
     }
 };
 
+const updateCommentFailures = ({location, msg, param, value}) => {
+    return {
+        type: "Error",
+        status: "400 Bad Request",
+        name: "Update comment Failure",
+        location: location,
+        param: param,
+        message: msg,
+        value: value,
+    }
+};
+
 module.exports = {
     registrationFailures,
     loginFailures,
@@ -143,5 +155,6 @@ module.exports = {
     removeLikeFailures,
     updatePostDataFailures,
     newCategoryFailures,
-    updateCategoryFailures
+    updateCategoryFailures,
+    updateCommentFailures
 }

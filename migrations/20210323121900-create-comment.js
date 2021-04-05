@@ -6,12 +6,11 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       author_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        // foreignKey: ,
         // references: {
         //   model: "Users",
         //   key: "id"

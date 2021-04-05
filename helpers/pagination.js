@@ -1,8 +1,8 @@
-const { Op, Sequelize } = require('sequelize')
-// const Category = require('../sequlize').Category;
+const { Op } = require('sequelize')
+const { Category, Post, Favorite } = require('../models');
 
 
-const paginatePosts = async (model, pageSize, pageLimit, search = {},
+const paginatePosts = async (req, pageSize, pageLimit, search = {},
                         filter1 = {},  filterStatus = {},
                         order = {}, transform) => {
     try {
@@ -17,15 +17,6 @@ const paginatePosts = async (model, pageSize, pageLimit, search = {},
             }
         }
 
-        // if (filter2 && filter2.length && filter2[0][0] === 'category') {
-        //     options.include = [{
-        //         model: Category,
-        //         as: 'Categories',
-        //         where: {title: filter2[0][1]},
-        //         attributes: []
-        //     }]
-        // }
-
         if (filter1 && filter1.length)
             options.where.createdAt = {[Op.between]: [filter1[0][0], filter1[0][1]]}
         if (filterStatus && filterStatus.length)
@@ -37,30 +28,44 @@ const paginatePosts = async (model, pageSize, pageLimit, search = {},
         if (order && order.length)
             options['order'] = order
 
-        let {count, rows} = await model.findAndCountAll(options)
+        let posts;
+        console.log("HERE")
+        console.log(req.user.id)
+        console.log("HERE")
+        if (req.type === "favorites") { // find all favorite posts
+            posts = await Post.findAndCountAll({
+                include: [{
+                    model: Favorite,
+                    where: { userId: req.user.id },
+                    required: true,
+                    attributes: [],
+                }]
+            })
+        } else { // find all Posts
+            posts = await Post.findAndCountAll(options)
+        }
 
         if (transform && typeof transform === 'function')
-            rows = await transform(rows)
+            posts.rows = await transform(posts.rows)
 
         return {
             status: 'success',
             previousPage: getPreviousPage(page),
             currentPage: page,
-            nextPage: getNextPage(page, limit, count),
-            total_posts: count,
-            pages: getTotalPages(count, limit),
+            nextPage: getNextPage(page, limit, posts.count),
+            total_posts: posts.count,
+            pages: getTotalPages(posts.count, limit),
             limit,
             filter1,
             filterStatus,
-            // filter2,
-            data: rows
+            data: posts.rows
         }
     } catch (err) {
         throw 'Internal Server Error'
     }
 }
 
-const paginateCategories = async (model, pageSize, pageLimit, order = {}, transform) => {
+const paginateCategories = async (pageSize, pageLimit, order = {}, transform) => {
     try {
         const limit = parseInt(pageLimit, 10) || 15
         const page = parseInt(pageSize, 10) || 1
@@ -68,32 +73,12 @@ const paginateCategories = async (model, pageSize, pageLimit, order = {}, transf
         let options = {
             offset: page * limit - limit,
             limit,
-            // where: {
-            //     status: ["active", "inactive"]
-            // }
         }
-
-        // if (filter2 && filter2.length && filter2[0][0] === 'category') {
-        //     options.include = [{
-        //         model: Category,
-        //         as: 'Categories',
-        //         where: {title: filter2[0][1]},
-        //         attributes: []
-        //     }]
-        // }
-
-        // if (filter1 && filter1.length)
-        //     options.where.createdAt = {[Op.between]: [filter1[0][0], filter1[0][1]]}
-        // if (filterStatus && filterStatus.length)
-        //     options.where.status = filterStatus
-        //
-        // if (Object.keys(search).length)
-        //     options = {options, ...search}
 
         if (order && order.length)
             options['order'] = order
 
-        let { count, rows } = await model.findAndCountAll(options)
+        let { count, rows } = await Category.findAndCountAll(options)
 
         if (transform && typeof transform === 'function')
             rows = await transform(rows)

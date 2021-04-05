@@ -86,7 +86,7 @@ async function createNewUser(req, res) {
         });
         // Creating a verification message and sending it to the user email
         sendMail(await emailConfirmMessage(req.body.email, req.body.full_name, confirm_token.token));
-        res.status(200).json({
+        res.status(201).json({
             status: "success",
             message: "New user created successfully"
         });

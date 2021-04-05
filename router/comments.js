@@ -6,23 +6,22 @@ const verifyToken = require('../middleware/verifyToken')
 const { Validation } = require('../middleware/dataValidation')
 const validation = new Validation;
 const {
-    getAllCategories,
-    getCategoryById,
-    getAllPostsByCategoryId,
-    createNewCategory,
-    updateCategory,
-    deleteCategory
-} = require('../controllers/categories_controller');
+    getCommentById,
+    getAllLikesByPostId,
+    createNewCommentLike,
+    updateComment,
+    deleteComment,
+    deleteCommentLike
+} = require('../controllers/comments_controller');
 
+router.get('/:comment_id', getCommentById);
+router.get('/:comment_id/like', verifyToken, getAllLikesByPostId);
 
-router.get('/', getAllCategories);
-router.get('/:category_id', getCategoryById);
-router.get('/:category_id/posts', getAllPostsByCategoryId);
+router.post('/:comment_id/like', verifyToken, validation.likeDataSchema, createNewCommentLike);
 
-router.post('/', verifyToken, validation.createCategorySchema, createNewCategory);
+router.patch('/:comment_id', verifyToken, validation.commentDataSchema, updateComment);
 
-router.patch('/:category_id', verifyToken, validation.updateCategorySchema, updateCategory);
-
-router.delete('/:category_id', verifyToken, deleteCategory);
+router.delete('/:comment_id', verifyToken, deleteComment);
+router.delete('/:comment_id/like', verifyToken, validation.likeDataSchema, deleteCommentLike);
 
 module.exports = router;

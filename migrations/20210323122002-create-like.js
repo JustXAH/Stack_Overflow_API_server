@@ -36,8 +36,10 @@ module.exports = {
         defaultValue: null,
         // references: {
         //   model: "Comments",
-        //   key: "id"
-        // }
+        //   key: "id",
+        // //   onDelete: "CASCADE"
+        // },
+        // onDelete: "CASCADE"
       },
       type: {
         type: Sequelize.ENUM('like', 'dislike'),

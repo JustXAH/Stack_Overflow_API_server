@@ -79,16 +79,15 @@ class Validation {
                .notEmpty()
        ]
 
-       this.createCommentDataSchema = [
+       this.commentDataSchema = [
            check('content', "Field 'content' must exist and cannot be empty")
                .notEmpty()
        ]
 
-       this.LikeDataSchema = [
+       this.likeDataSchema = [
            check('type', "The field 'type' must exist and can be only 'like'" +
                " or 'dislike'")
                .custom((value) => value === "like" || value === "dislike")
-               // .withMessage("The type can be only 'like' or 'dislike'"),
        ]
 
        this.updatePostDataSchema = [

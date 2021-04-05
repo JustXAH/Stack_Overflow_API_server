@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
   class Post extends Model {
     static associate(models) {
       Post.hasMany(models.PostCategory, { foreignKey: 'post_id', onDelete: 'CASCADE' });
+      Post.hasMany(models.Favorite, { foreignKey: 'postId', onDelete: 'CASCADE' });
       Post.hasMany(models.Comment, { foreignKey: 'post_id', onDelete: 'CASCADE' });
       Post.hasMany(models.Like, { foreignKey: 'post_id', onDelete: 'CASCADE' });
       Post.belongsTo(models.User, {foreignKey: 'author_id'});
