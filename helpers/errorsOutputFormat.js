@@ -108,6 +108,30 @@ const updatePostDataFailures = ({location, msg, param, value}) => {
     }
 };
 
+const newCategoryFailures = ({location, msg, param, value}) => {
+    return {
+        type: "Error",
+        status: "400 Bad Request",
+        name: "Create new category Failure",
+        location: location,
+        param: param,
+        message: msg,
+        value: value,
+    }
+};
+
+const updateCategoryFailures = ({location, msg, param, value}) => {
+    return {
+        type: "Error",
+        status: "400 Bad Request",
+        name: "Update category Failure",
+        location: location,
+        param: param,
+        message: msg,
+        value: value,
+    }
+};
+
 module.exports = {
     registrationFailures,
     loginFailures,
@@ -117,5 +141,7 @@ module.exports = {
     newCommentFailures,
     newLikeFailures,
     removeLikeFailures,
-    updatePostDataFailures
+    updatePostDataFailures,
+    newCategoryFailures,
+    updateCategoryFailures
 }

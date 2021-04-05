@@ -106,9 +106,17 @@ class Validation {
        this.createCategorySchema = [
            check('title', "Field 'title' cannot be empty")
                .notEmpty(),
-           // check('description', "Field 'content' cannot be empty")
-           //     .if(body('description').exists())
-           //     .notEmpty(),
+           check('description', "Field 'description' cannot be empty")
+               .if(body('description').exists())
+               .notEmpty(),
+       ]
+       this.updateCategorySchema = [
+           check('title', "Field 'title' cannot be empty")
+               .if(body('title').exists())
+               .notEmpty(),
+           check('description', "Field 'description' cannot be empty")
+               .if(body('description').exists())
+               .notEmpty(),
        ]
    }
 }

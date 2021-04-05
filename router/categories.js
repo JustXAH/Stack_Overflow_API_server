@@ -21,7 +21,7 @@ router.get('/:category_id/posts', getAllPostsByCategoryId);
 
 router.post('/', verifyToken, validation.createCategorySchema, createNewCategory);
 
-router.patch('/:category_id', verifyToken, validation.updatePostDataSchema, updateCategory);
+router.patch('/:category_id', verifyToken, validation.updateCategorySchema, updateCategory);
 
 router.delete('/:category_id', verifyToken, deleteCategory);
 

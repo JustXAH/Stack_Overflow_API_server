@@ -5,10 +5,8 @@ const { Op } = require('sequelize');
 const { paginateCategories } = require('../helpers/pagination');
 const { validationResult } = require('express-validator');
 const {
-    newCommentFailures,
-    newPostFailures,
-    newLikeFailures,
-    removeLikeFailures
+    newCategoryFailures,
+    updateCategoryFailures
 } = require('../helpers/errorsOutputFormat')
 
 async function getAllCategories (req, res) {
@@ -105,7 +103,7 @@ async function getAllPostsByCategoryId(req, res) {
 
 async function createNewCategory(req, res) {
     try {
-        const errors = validationResult(req).formatWith(newPostFailures);
+        const errors = validationResult(req).formatWith(newCategoryFailures);
 
         if (!errors.isEmpty())
             return res.status(400).json({
@@ -137,7 +135,7 @@ async function createNewCategory(req, res) {
             description: description,
         })
 
-        res.status(200).json({
+        res.status(201).json({
             status: "success",
             message: "New category created successfully"
         });
@@ -148,7 +146,7 @@ async function createNewCategory(req, res) {
 
 async function updateCategory(req, res) {
     try {
-        const errors = validationResult(req).formatWith(newPostFailures);
+        const errors = validationResult(req).formatWith(updateCategoryFailures);
 
         if (!errors.isEmpty())
             return res.status(400).json({
@@ -156,56 +154,43 @@ async function updateCategory(req, res) {
                 errors: errors.array()
             })
 
-        const {title, content, category} = req.body;
+        const { title, description } = req.body;
 
-        if (!title && !content && !category)
+        if (!title && !description)
             return res.status(400).json({
                 status: "error",
-                message: "No data to update the post"
+                message: "No data to update the category"
             })
 
-        const postId = Number(req.params.post_id);
-        const postById = await Post.findByPk(postId);
-
-        if (!postById)
-            return res.status(404).json({
-                status: "error",
-                message: "Post not found by requested param - post ID"
-            })
-
-        if (postById.author_id !== req.user.id && req.user.role !== 'admin')
+        if (req.user.role !== 'admin')
             return res.status(403).json({
                 status: "error",
-                message: "Only the creator of the post or admin can update this post"
+                message: "Permission denied! Only admin can update the category"
+            })
+
+        const categoryId = Number(req.params.category_id);
+        const categoryById = await Category.findByPk(categoryId);
+
+        if (!categoryById)
+            return res.status(404).json({
+                status: "error",
+                message: "Category not found by requested param - category ID"
             })
 
         if (title)
-            postById.title = title;
-        if (content)
-            postById.content = content;
+            categoryById.title = title;
+        if (description)
+            categoryById.description = description;
 
-        await Post.update({
-            title: postById.title,
-            content: postById.content,
+        await Category.update({
+            title: categoryById.title,
+            description: categoryById.description,
             updatedAt: new Date(Date.now())
-        }, { where: { id: postId} })
-
-        if (category) {
-            const newCategories = category.split(',');
-
-            await PostCategory.destroy({ where: { post_id: postId } });
-
-            newCategories.forEach((newCategory) => {
-                PostCategory.create({
-                    post_id: postId,
-                    category_id: newCategory
-                })
-            });
-        }
+        }, { where: { id: categoryId} })
 
         res.status(200).json({
             status: "success",
-            message: "Post updated successfully"
+            message: "Category updated successfully"
         });
     } catch (err) {
         res.status(500).json({ status: "error", message: err });
@@ -217,7 +202,7 @@ async function deleteCategory(req, res) {
         if (req.user.role !== 'admin')
             return res.status(403).json({
                 status: "error",
-                message: "Permission denied! Only admin can delete category"
+                message: "Permission denied! Only admin can delete the category"
             })
 
         const categoryId = Number(req.params.category_id);
