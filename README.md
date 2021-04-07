@@ -8,13 +8,13 @@ Stack Overflow clone -  is challenge to create an API for a future question and 
 > CREATE USER ikhanenko@localhost IDENTIFIED BY 'Super_securepass_123';
 > GRANT ALL PRIVILEGES ON * . * TO ikhanenko@localhost;
 > Make **.env** file with next parameters:
-    SALT_ROUNDS=Default value '10'
-    JWT_SECRET_KEY=Your secret key
-    JWT_EXPIRES_IN=Token expires time
-    USOF_EMAIL_HOST=Your email host
-    USOF_EMAIL_PORT=Your email port
-    USOF_EMAIL=Your email address
-    USOF_EMAIL_PASSWORD=Your email password for app
+    SALT_ROUNDS= (Default value '10')
+    JWT_SECRET_KEY= (Your secret key)
+    JWT_EXPIRES_IN= (Token expires time)
+    USOF_EMAIL_HOST= (Your email host)
+    USOF_EMAIL_PORT= (Your email port)
+    USOF_EMAIL= (Your email address)
+    USOF_EMAIL_PASSWORD= (Your email password for app)
 
 ```
 #usage:
