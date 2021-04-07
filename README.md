@@ -1,13 +1,9 @@
 # usof--Stack_Overflow_clone
 Stack Overflow clone -  is challenge to create an API for a future question and answer service for professional and enthusiast programmer.
 
-#installation:
+#preparation:
 ```md
-> npm install
-> mysql -u root
-> CREATE USER ikhanenko@localhost IDENTIFIED BY 'Super_securepass_123';
-> GRANT ALL PRIVILEGES ON * . * TO ikhanenko@localhost;
-> Make **.env** file with next parameters:
+> Make .env file with next parameters:
     SALT_ROUNDS= (Default value '10')
     JWT_SECRET_KEY= (Your secret key)
     JWT_EXPIRES_IN= (Token expires time)
@@ -15,8 +11,17 @@ Stack Overflow clone -  is challenge to create an API for a future question and 
     USOF_EMAIL_PORT= (Your email port)
     USOF_EMAIL= (Your email address)
     USOF_EMAIL_PASSWORD= (Your email password for app)
-
 ```
+
+#installation:
+```md
+> npm install
+> mysql -u root
+> CREATE USER ikhanenko@localhost IDENTIFIED BY 'Super_securepass_123';
+> GRANT ALL PRIVILEGES ON * . * TO ikhanenko@localhost;
+> 
+```
+
 #usage:
 ```md
 > nodemon server.js
@@ -27,6 +32,7 @@ Stack Overflow clone -  is challenge to create an API for a future question and 
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "config": "^3.3.6",
+    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "email-validator": "^2.0.4",
     "express": "^4.17.1",
@@ -36,9 +42,9 @@ Stack Overflow clone -  is challenge to create an API for a future question and 
     "multer": "^1.4.2",
     "mysql2": "^2.2.5",
     "nodemailer": "^6.5.0",
+    "nodemon": "^2.0.7",
     "sequelize": "^6.5.0"
     "sequelize-cli": "^6.2.0"
-    "nodemon": "^2.0.7",
     node v13 and higher<br/>
     npm v13 and higher<br/>
 ```
