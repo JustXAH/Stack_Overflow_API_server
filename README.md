@@ -24,6 +24,8 @@ Stack Overflow clone -  is challenge to create an API for a future question and 
 
 #usage:
 ```md
+> npx sequelize-cli db:migrate
+> npx sequelize-cli db:seed:all
 > nodemon server.js
 ```
 
@@ -45,8 +47,8 @@ Stack Overflow clone -  is challenge to create an API for a future question and 
     "nodemon": "^2.0.7",
     "sequelize": "^6.5.0"
     "sequelize-cli": "^6.2.0"
-    node v13 and higher<br/>
-    npm v13 and higher<br/>
+    node v15.11.0 and higher<br/>
+    npm v7.8.0 and higher<br/>
 ```
 ##licenses:<br/>
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)

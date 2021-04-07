@@ -5,7 +5,7 @@ module.exports = {
     await queryInterface.bulkInsert('Users', [
       {
         login: 'admin',
-        password: '$2b$10$0j1veusEMYTXm6YGSbk0teLqMLvbJ6MFYc24kSWsfBEsOoGr4VpEy',
+        password: '$2b$10$EAuUH2aCdU1sWchlzcNa4ucxkWSHUHLJPlz6F0cHx6tL81AYCWkE6',
         full_name: 'Admin Adminovich',
         email: 'usofXAH@gmail.com',
         rating: '999',
@@ -13,26 +13,17 @@ module.exports = {
         email_confirmed: true,
       },
       {
-        login: 'JustXAH',
-        password: '$2b$10$0j1veusEMYTXm6YGSbk0teLqMLvbJ6MFYc24kSWsfBEsOoGr4VpEy',
-        full_name: 'Igor Khanenko',
-        email: 'justxah@gmail.com',
-        rating: '4',
-        role: 'user',
-        email_confirmed: true,
-      },
-      {
         login: 'User1',
-        password: '$2b$10$0j1veusEMYTXm6YGSbk0teLqMLvbJ6MFYc24kSWsfBEsOoGr4VpEy',
+        password: '$2b$10$EAuUH2aCdU1sWchlzcNa4ucxkWSHUHLJPlz6F0cHx6tL81AYCWkE6',
         full_name: 'First User',
-        email: 'user2@gmail.com',
+        email: 'user1@gmail.com',
         rating: '0',
         role: 'user',
         email_confirmed: true,
       },
       {
         login: 'User2',
-        password: '$2b$10$0j1veusEMYTXm6YGSbk0teLqMLvbJ6MFYc24kSWsfBEsOoGr4VpEy',
+        password: '$2b$10$EAuUH2aCdU1sWchlzcNa4ucxkWSHUHLJPlz6F0cHx6tL81AYCWkE6',
         full_name: 'Second User',
         email: 'user2@gmail.com',
         rating: '0',
@@ -41,7 +32,7 @@ module.exports = {
       },
       {
         login: 'User3',
-        password: '$2b$10$0j1veusEMYTXm6YGSbk0teLqMLvbJ6MFYc24kSWsfBEsOoGr4VpEy',
+        password: '$2b$10$EAuUH2aCdU1sWchlzcNa4ucxkWSHUHLJPlz6F0cHx6tL81AYCWkE6',
         full_name: 'Third User',
         email: 'user3@gmail.com',
         rating: '0',
@@ -50,7 +41,7 @@ module.exports = {
       },
       {
         login: 'User4',
-        password: '$2b$10$0j1veusEMYTXm6YGSbk0teLqMLvbJ6MFYc24kSWsfBEsOoGr4VpEy',
+        password: '$2b$10$EAuUH2aCdU1sWchlzcNa4ucxkWSHUHLJPlz6F0cHx6tL81AYCWkE6',
         full_name: 'Fourth User',
         email: 'user4@gmail.com',
         rating: '0',
@@ -59,7 +50,7 @@ module.exports = {
       },
       {
         login: 'User5',
-        password: '$2b$10$0j1veusEMYTXm6YGSbk0teLqMLvbJ6MFYc24kSWsfBEsOoGr4VpEy',
+        password: '$2b$10$EAuUH2aCdU1sWchlzcNa4ucxkWSHUHLJPlz6F0cHx6tL81AYCWkE6',
         full_name: 'Fifth User',
         email: 'user5@gmail.com',
         rating: '0',

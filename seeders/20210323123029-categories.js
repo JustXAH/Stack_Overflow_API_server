@@ -12,23 +12,17 @@ module.exports = {
             "prototype-based, multi-paradigm scripting language that is " +
             "dynamic, and supports object-oriented, imperative, and functional " +
             "programming styles.",
-        // createdAt: new Date(Date.now()),
-        // updatedAt: new Date(Date.now())
       },
       {
         title: "Node.js",
         description: "Node.js is a platform built on Chrome\'s JavaScript" +
             " runtime for easily building fast and scalable network applications.",
-        // createdAt: new Date(Date.now()),
-        // updatedAt: new Date(Date.now())
       },
       {
         title: "MySQL",
         description: "MySQL is a freely available open source Relational " +
             "Database Management System (RDBMS) that uses Structured Query " +
             "Language (SQL).",
-        // createdAt: new Date(Date.now()),
-        // updatedAt: new Date(Date.now())
       },
       {
         title: "Sequelize",
@@ -36,46 +30,34 @@ module.exports = {
             "MySQL, MariaDB, SQLite and Microsoft SQL Server. It features solid" +
             " transaction support, relations, eager and lazy loading, read " +
             "replication and more.",
-        // createdAt: new Date(Date.now()),
-        // updatedAt: new Date(Date.now())
       },
       {
         title: "Java",
         description: "Java is a class-based, object-oriented programming " +
             "language that is designed to have as few implementation " +
             "dependencies as possible.",
-        // createdAt: new Date(Date.now()),
-        // updatedAt: new Date(Date.now())
       },
       {
         title: "C",
         description: "The C programming language is a computer programming" +
             " language that was developed to do system programming for the" +
             " operating system UNIX and is an imperative programming language.",
-        // createdAt: new Date(Date.now()),
-        // updatedAt: new Date(Date.now())
       },
       {
         title: "C++",
         description: "C++ is a general-purpose programming language created" +
             " by Bjarne Stroustrup as an extension of the C programming" +
             " language, or 'C with Classes'.",
-        // createdAt: new Date(Date.now()),
-        // updatedAt: new Date(Date.now())
       },
       {
         title: "MacOs",
         description: "MacOS is the operating system that powers every Mac.",
-        // createdAt: new Date(Date.now()),
-        // updatedAt: new Date(Date.now())
       },
       {
         title: "IDE",
         description: "An integrated development environment (IDE) is a " +
             "software application that provides comprehensive facilities to " +
             "computer programmers for software development.",
-        // createdAt: new Date(Date.now()),
-        // updatedAt: new Date(Date.now())
       },
       {
         title: "WebStorm",
@@ -84,8 +66,6 @@ module.exports = {
             "TypeScript, HTML, CSS as well as for frameworks such as React, " +
             "Angular, and Vue.js right out of the box, no additional plugins " +
             "are required.",
-        // createdAt: new Date(Date.now()),
-        // updatedAt: new Date(Date.now())
       },
     ])
   },
