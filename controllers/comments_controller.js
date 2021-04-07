@@ -1,14 +1,13 @@
 'use strict';
 
-const { User, Category, Post, Comment, PostCategory, Like } = require('../models');
-const { Op } = require('sequelize');
-const paginate = require('../helpers/pagination');
+const { User, Comment,  Like } = require('../models');
 const { validationResult } = require('express-validator');
+const updateUserRating = require('../helpers/updateUserRating');
 const {
     newLikeFailures,
     updateCommentFailures,
     removeLikeFailures,
-} = require('../helpers/errorsOutputFormat')
+} = require('../helpers/errorsOutputFormat');
 
 
 async function getCommentById(req, res) {
@@ -187,9 +186,13 @@ async function deleteComment(req, res) {
                     " delete this comment"
             })
 
+        /*
+        | Search and delete all comment likes and dislikes from database.
+        | Update comment author rating and remove comment.
+         */
         await Like.destroy({ where: { comment_id: commentId } });
-        commentById.destroy();
-
+        await User.decrement({ rating: commentById.rating }, { where: { id: commentById.author_id } });
+        await commentById.destroy();
 
         res.status(200).json({
             status: "success",
@@ -255,7 +258,6 @@ async function deleteCommentLike(req, res) {
         res.status(500).json({ status: "error", message: err });
     }
 }
-
 
 module.exports = {
     getCommentById,

@@ -15,7 +15,7 @@ module.exports = function verifyToken(req, res, next) {
                 });
             }
             const user = await User.findOne({
-                attributes: ["id", "login", "full_name", "email", "avatar", "rating", "role"],
+                // attributes: ["id", "login", "full_name", "email", "avatar", "rating", "role"],
                 where: { id: payload.id }
             });
             if (!user)

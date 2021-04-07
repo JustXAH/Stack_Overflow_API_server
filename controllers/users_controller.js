@@ -1,17 +1,17 @@
 'use strict';
 
-const { User, Post, Comment } = require('../models');
+const { User } = require('../models');
 const { validationResult } = require('express-validator');
-const { registrationFailures } = require('../helpers/errorsOutputFormat')
+const { registrationFailures } = require('../helpers/errorsOutputFormat');
 const { emailConfirmMessage } = require('../helpers/mailCreators');
 const sendMail = require('../helpers/sendMail');
-const deletePrevAvatar = require('../helpers/deletePrevAvatar')
-const sequelize = require('sequelize');
+const deletePrevAvatar = require('../helpers/deletePrevAvatar');
 const {
     passwordHashing,
     comparingHashPasswords,
     randomTokenCreator,
-} = require('../helpers/helpers')
+} = require('../helpers/helpers');
+
 
 async function getAllUsers(req, res) {
     try {
@@ -34,52 +34,14 @@ async function getAllUsers(req, res) {
 async function getUserById(req, res) {
     try {
         const userById = await User.findByPk(req.params.user_id,{
-            attributes: ["id", "login", "full_name", "email", "avatar", "rating", "role"],
+            attributes: ["id", "login", "full_name", "email", "avatar", "rating", "role", "createdAt", "updatedAt"],
         })
         if (!userById)
-            res.status(404).json({
+            return res.status(404).json({
                 status: "error",
                 message: "User not found by requested param - user ID"
             })
         else {
-            // update user rating
-            let userRating = 0;
-            const UserPostRatings = await Post.findAll({
-                where: { author_id: req.params.user_id },
-                attributes: [
-                    'rating',
-                    [sequelize.fn('sum', sequelize.col('rating')), 'total'],
-                ],
-                group: ['Post.id'],
-                raw: true,
-            });
-            const UserCommentRatings = await Comment.findAll({
-                where: { author_id: req.params.user_id },
-                attributes: [
-                    'rating',
-                    [ sequelize.fn('sum', sequelize.col('rating')), 'total' ],
-                ],
-                group: ['Comment.id'],
-                raw: true,
-            });
-            console.log("=====POSTS=====")
-            UserPostRatings.forEach((post) => {
-                userRating = post.rating + userRating;
-                console.log(post.rating)
-                console.log(userRating)
-            })
-            console.log("=====COMMENTS=====")
-            UserCommentRatings.forEach((comment) => {
-                userRating = comment.rating + userRating;
-                console.log(comment.rating)
-                console.log(userRating)
-            })
-            // console.log(test);
-            console.log("=====TOTAL=====")
-            console.log(userRating);
-            await userById.increment('rating', { by: userRating });
-            userById.rating = userRating;
-
             res.status(200).json({ status: "success", data: userById })
         }
     } catch (err) {
@@ -100,13 +62,13 @@ async function createNewUser(req, res) {
                 status: "error",
                 message: "Permission denied! Access is allowed only to the admin"
             })
-        const userByLogin = await User.findOne({where: {login: req.body.login}})
+        const userByLogin = await User.findOne({ where: { login: req.body.login } })
         if (userByLogin)
             return res.status(403).json({
                 status: "error",
                 message: "User with this login already exists"
             })
-        const userByEmail = await User.findOne({where: {email: req.body.email}})
+        const userByEmail = await User.findOne({ where: { email: req.body.email } })
         if (userByEmail)
             return res.status(403).json({
                 status: "error",
@@ -183,14 +145,14 @@ async function updateUserData(req, res) {
                 message: "User not found by requested param - user ID"
             })
         if (req.body.login !== userById.login
-            && await User.findOne({ where: {login: req.body.login} })!== null) {
+            && await User.findOne({ where: {login: req.body.login } })!== null) {
             return res.status(403).json({
                 status: "error",
                 message: "Login is already taken"
             })
         }
         if (req.body.email !== userById.email
-            && await User.findOne({ where: {email: req.body.email} })!== null) {
+            && await User.findOne({ where: { email: req.body.email } })!== null) {
             return res.status(403).json({
                 status: "error",
                 message: "Email is already taken"

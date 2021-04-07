@@ -4,12 +4,13 @@ const { User, Category, Post, Comment, PostCategory, Like, Favorite } = require(
 const { Op } = require('sequelize');
 const { paginatePosts } = require('../helpers/pagination');
 const { validationResult } = require('express-validator');
+const updateUserRating = require('../helpers/updateUserRating');
 const {
     newCommentFailures,
     newPostFailures,
     newLikeFailures,
     removeLikeFailures
-} = require('../helpers/errorsOutputFormat')
+} = require('../helpers/errorsOutputFormat');
 
 
 async function getAllPosts(req, res) {
@@ -523,8 +524,36 @@ async function deletePost(req, res) {
                 message: "Only the creator of the post or admin can delete this post"
             })
 
+        /*
+        | Search and delete all comments under this post, likes and dislikes
+        | for these comments from database.
+        | Update comment author rating before removing comment.
+         */
+        const postComments = await Comment.findAll({ where: { post_id: postId } });
+
+        postComments.forEach((comment) => {
+            if (comment.rating !== 0 && comment.author_id !== postById.author_id) {
+                User.decrement({ rating: comment.rating }, { where: { id: comment.author_id } });
+            }
+            Like.destroy({ where: { comment_id: comment.id } });
+            comment.destroy();
+        });
+        /*
+        | Delete all post likes and dislikes from database.
+         */
+        await Like.destroy({ where: { post_id: postId } });
+        /*
+        | Removing all links of posts to categories from PostCategories table.
+        | After that delete post and update users rating.
+        */
+        await PostCategory.destroy({ where: { post_id: postId } });
         await postById.destroy();
-        await PostCategory.destroy({ where: { post_id: postId} });
+        if (req.user.id !== postById) {
+            const postAuthor = await User.findByPk(postById.author_id);
+            await updateUserRating(postAuthor);
+        } else {
+            await updateUserRating(req.user);
+        }
 
         res.status(200).json({
             status: "success",
