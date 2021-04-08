@@ -15,10 +15,7 @@ class Validation {
                .custom((value, { req }) => value === req.body.password)
                .withMessage('The confirmPassword must match the password field'),
            check('full_name')
-               // .exists().withMessage('Full name must exist')
                .notEmpty().withMessage('Full name is a required field'),
-           // .isAlpha().withMessage('Full name must contain only alpha characters'),
-           // .isUppercase().withMessage('Must start')
            check('email', 'Invalid email address')
                .isEmail().normalizeEmail()
        ]

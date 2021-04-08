@@ -6,16 +6,10 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Comment.belongsTo(models.User, { foreignKey: 'author_id'} );
       Comment.belongsTo(models.Post, { foreignKey: 'post_id' });
-      Comment.hasMany(models.Like, { onDelete: 'CASCADE', foreignKey: 'comment_id' });
+      Comment.hasMany(models.Like, { foreignKey: 'comment_id' });
     }
   }
   Comment.init({
-    // id: {
-    //   primaryKey: true,
-    //   autoIncrement: true,
-    //   allowNull: false,
-    //   type: DataTypes.INTEGER
-    // },
     author_id: {
       type: DataTypes.INTEGER,
       allowNull: false,

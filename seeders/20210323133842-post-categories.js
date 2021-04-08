@@ -51,6 +51,14 @@ module.exports = {
         post_id: 4,
         category_id: 5,
       },
+      {
+        post_id: 6,
+        category_id: 2,
+      },
+      {
+        post_id: 6,
+        category_id: 8,
+      },
     ])
   },
 

@@ -8,8 +8,5 @@ module.exports = async function deletePrevAvatar (filename) {
         if (err) {
             return console.error(err)
         }
-        // else {
-        //     return console.log("Previous avatar has been removed")
-        // }
     })
 }

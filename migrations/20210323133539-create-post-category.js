@@ -11,20 +11,10 @@ module.exports = {
       post_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        // references: {
-        //   model: "Posts",
-        //   key: "id",
-        //   onDelete: "CASCADE"
-        // }
       },
       category_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        // references: {
-        //   model: "Categories",
-        //   key: "id",
-        //   onDelete: "CASCADE"
-        // }
       },
     });
   },

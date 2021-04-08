@@ -11,20 +11,11 @@ module.exports = {
       author_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        // references: {
-        //   model: "Users",
-        //   key: "id"
-        // }
       },
       title: {
         type: Sequelize.STRING(1234),
         allowNull: false,
       },
-      // publish_date: {
-      //   type: Sequelize.DATE,
-      //   allowNull: false,
-      //   defaultValue: Sequelize.NOW
-      // },
       status: {
         type: Sequelize.ENUM('active', 'inactive'),
         allowNull: false,
@@ -39,14 +30,6 @@ module.exports = {
         allowNull: false,
         defaultValue: 0,
       },
-      // categories: {
-      //   type: Sequelize.INTEGER,
-      //   allowNull: false,
-      //   references: {
-      //     model: "Categories",
-      //     key: "id"
-      //   }
-      // },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
